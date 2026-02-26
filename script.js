@@ -117,4 +117,3 @@ function deleteMovie(index) {
   saveMovies(movies);
   loadMovies();
 }
-``
