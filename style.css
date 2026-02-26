@@ -1,58 +1,85 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #f4f4f4;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f6fb;
 }
 
+/* NAVIGATION BAR */
 nav {
-    background-color: #222;
-    color: white;
-    padding: 15px;
+    background-color: #0a1f44;  /* Dark blue */
+    padding: 15px 40px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
 }
 
 nav a {
     color: white;
     text-decoration: none;
-    margin-left: 15px;
+    margin-left: 30px;
+    font-weight: bold;
 }
 
 nav a:hover {
     text-decoration: underline;
 }
 
+/* CONTAINER */
 .container {
-    padding: 40px;
+    padding: 60px;
+    text-align: center;
+}
+
+/* HOME TITLE */
+.home-title {
+    font-size: 48px;
+    color: #0a1f44;
+    margin-top: 150px;
+}
+
+/* ADMIN PANEL */
+.admin-box {
+    background: white;
+    width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 input {
-    padding: 8px;
-    margin: 5px;
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 button {
-    padding: 8px 12px;
-    background-color: #222;
+    background-color: #0a1f44;
     color: white;
+    padding: 10px 15px;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #444;
+    background-color: #163a78;
 }
 
 ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
 }
 
 li {
     background: white;
-    padding: 10px;
-    margin: 5px 0;
+    margin: 10px auto;
+    padding: 15px;
+    width: 60%;
     display: flex;
     justify-content: space-between;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
