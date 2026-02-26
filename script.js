@@ -1,7 +1,22 @@
-// Change this password if you want
 const ADMIN_PASSWORD = "TwoKies123";
 
-// LOGIN FUNCTION
+document.addEventListener("DOMContentLoaded", function () {
+
+    const loginBtn = document.getElementById("loginBtn");
+    const addMovieBtn = document.getElementById("addMovieBtn");
+
+    if (loginBtn) {
+        loginBtn.addEventListener("click", checkPassword);
+    }
+
+    if (addMovieBtn) {
+        addMovieBtn.addEventListener("click", addMovie);
+    }
+
+    loadMovies();
+});
+
+/* LOGIN FUNCTION */
 function checkPassword() {
     const passwordInput = document.getElementById("adminPassword").value;
     const message = document.getElementById("loginMessage");
@@ -9,14 +24,13 @@ function checkPassword() {
     if (passwordInput === ADMIN_PASSWORD) {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("adminPanel").style.display = "block";
-        loadMovies();
     } else {
         message.textContent = "Incorrect password.";
         message.style.color = "red";
     }
 }
 
-// STORE MOVIES IN LOCAL STORAGE
+/* STORAGE FUNCTIONS */
 function getMovies() {
     return JSON.parse(localStorage.getItem("movies")) || [];
 }
@@ -25,13 +39,13 @@ function saveMovies(movies) {
     localStorage.setItem("movies", JSON.stringify(movies));
 }
 
-// ADD MOVIE
+/* ADD MOVIE */
 function addMovie() {
     const title = document.getElementById("movieTitle").value;
     const time = document.getElementById("movieTime").value;
 
-    if (title === "" || time === "") {
-        alert("Please fill in all fields.");
+    if (!title || !time) {
+        alert("Please enter both fields.");
         return;
     }
 
@@ -45,45 +59,42 @@ function addMovie() {
     loadMovies();
 }
 
-// LOAD MOVIES INTO ADMIN PANEL
+/* LOAD MOVIES (ADMIN + SCHEDULE PAGE) */
 function loadMovies() {
     const movieList = document.getElementById("movieList");
-    movieList.innerHTML = "";
+    const scheduleList = document.getElementById("scheduleList");
 
     const movies = getMovies();
 
-    movies.forEach((movie, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `${movie.title} - ${movie.time}
-            <button onclick="deleteMovie(${index})">Delete</button>`;
-        movieList.appendChild(li);
-    });
+    if (movieList) {
+        movieList.innerHTML = "";
+        movies.forEach((movie, index) => {
+            const li = document.createElement("li");
+            li.innerHTML = `${movie.title} - ${movie.time}
+                <button onclick="deleteMovie(${index})">Delete</button>`;
+            movieList.appendChild(li);
+        });
+    }
+
+    if (scheduleList) {
+        scheduleList.innerHTML = "";
+        if (movies.length === 0) {
+            scheduleList.innerHTML = "<li>No movies scheduled.</li>";
+            return;
+        }
+
+        movies.forEach(movie => {
+            const li = document.createElement("li");
+            li.textContent = `${movie.title} - ${movie.time}`;
+            scheduleList.appendChild(li);
+        });
+    }
 }
 
-// DELETE MOVIE
+/* DELETE MOVIE */
 function deleteMovie(index) {
     const movies = getMovies();
     movies.splice(index, 1);
     saveMovies(movies);
     loadMovies();
-}
-
-// DISPLAY MOVIES ON CUSTOMER PAGE
-function displayMovies() {
-    const scheduleList = document.getElementById("scheduleList");
-    if (!scheduleList) return;
-
-    const movies = getMovies();
-    scheduleList.innerHTML = "";
-
-    if (movies.length === 0) {
-        scheduleList.innerHTML = "<li>No movies scheduled yet.</li>";
-        return;
-    }
-
-    movies.forEach(movie => {
-        const li = document.createElement("li");
-        li.textContent = `${movie.title} - ${movie.time}`;
-        scheduleList.appendChild(li);
-    });
 }
