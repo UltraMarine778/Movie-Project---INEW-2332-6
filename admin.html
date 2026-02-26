@@ -1,39 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - TwoKies</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <title>Admin - TwoKies</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <header>
+    <nav>
+      <div class="brand">TwoKies</div>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="schedule.html">View Schedule</a>
+        <a href="admin.html">Admin</a>
+      </div>
+    </nav>
+  </header>
 
-<nav>
-    <a href="index.html">Home</a>
-    <a href="schedule.html">View Schedule</a>
-    <a href="admin.html">Admin</a>
-</nav>
-
-<div class="container">
-
-    <div id="loginSection" class="admin-box">
+  <main>
+    <div class="container">
+      <div id="loginSection" class="admin-box">
         <h2>Admin Login</h2>
+        <label for="adminPassword">Password</label>
         <input type="password" id="adminPassword" placeholder="Enter Password">
         <button id="loginBtn">Login</button>
         <p id="loginMessage"></p>
-    </div>
+      </div>
 
-    <div id="adminPanel" class="admin-box" style="display:none;">
+      <div id="adminPanel" class="admin-box" style="display:none;">
         <h2>Schedule Showtimes</h2>
 
+        <label for="movieTitle">Movie Title</label>
         <input type="text" id="movieTitle" placeholder="Movie Title">
+
+        <label for="movieTime">Showtime</label>
         <input type="text" id="movieTime" placeholder="Showtime (7:00 PM)">
+
         <button id="addMovieBtn">Add Movie</button>
+
+        <p id="adminMessage"></p>
 
         <h3>Current Schedule</h3>
         <ul id="movieList"></ul>
+      </div>
     </div>
+  </main>
 
-</div>
+  <footer>
+    <p>&copy; 2026 TwoKies Cinema</p>
+  </footer>
 
-<script src="js/script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
