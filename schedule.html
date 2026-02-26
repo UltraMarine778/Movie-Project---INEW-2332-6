@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Schedule - TwoKies</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <title>Schedule - TwoKies</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body onload="displayMovies()">
-
-<nav>
-    <h2>TwoKies Movie Website</h2>
-    <div>
+<body onload="loadMovies()">
+  <header>
+    <nav>
+      <div class="brand">TwoKies</div>
+      <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="schedule.html">View Schedule</a>
         <a href="admin.html">Admin</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2>Movie Schedule</h2>
+      <ul id="scheduleList"></ul>
     </div>
-</nav>
+  </main>
 
-<div class="container">
-    <h2>Movie Schedule</h2>
-    <ul id="scheduleList"></ul>
-</div>
+  <footer>
+    <p>&copy; 2026 TwoKies Cinema</p>
+  </footer>
 
-<script src="js/script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
+``
