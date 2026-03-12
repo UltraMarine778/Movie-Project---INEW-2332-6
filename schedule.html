@@ -19,7 +19,31 @@
   <main>
     <div class="container">
       <h2>Movie Schedule</h2>
+
+
+      <div class="filters">
+
+        <label>Filter by Date</label>
+        <input type="date" id="filterDate">
+
+        <label>Filter by Location</label>
+        <select id="filterLocation">
+          <option value="">All Locations</option>
+          <option value="North Theater">North Theater</option>
+          <option value="Downtown Theater">Downtown Theater</option>
+          <option value="West Theater">West Theater</option>
+        </select>
+
+        <button onclick="applyFilters()">Filter</button>
+
+      </div>
+
       <ul id="scheduleList"></ul>
+
+
+      <h3>Your Cart</h3>
+      <ul id="cartList"></ul>
+
     </div>
   </main>
 
