@@ -73,6 +73,7 @@ function addMovie() {
 
   saveMovies(movies);
 
+  // Clear inputs
   document.getElementById("movieTitle").value = "";
   document.getElementById("movieDescription").value = "";
   document.getElementById("movieGenre").value = "";
@@ -112,7 +113,7 @@ function loadMovies() {
   loadCart();
 }
 
-/* DISPLAY SCHEDULE */
+/* DISPLAY SCHEDULE WITH EXPANDABLE DETAILS */
 function displaySchedule(movies) {
   const list = document.getElementById("scheduleList");
   if (!list) return;
@@ -128,12 +129,19 @@ function displaySchedule(movies) {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <div>
+      <div style="width:100%">
         <strong>${movie.title}</strong><br>
         ${movie.time} - ${movie.date} - ${movie.location}
+
+        <div id="details-${index}" class="movie-details" style="display:none;">
+          <p><strong>Genre:</strong> ${movie.genre}</p>
+          <p><strong>Runtime:</strong> ${movie.runtime} minutes</p>
+          <p><strong>Description:</strong> ${movie.description}</p>
+        </div>
       </div>
+
       <div>
-        <button onclick="showDetails(${index})">View Details</button>
+        <button onclick="toggleDetails(${index}, this)">View Details</button>
         <button onclick="addToCart(${index})">Add Ticket</button>
       </div>
     `;
@@ -142,16 +150,17 @@ function displaySchedule(movies) {
   });
 }
 
-/* VIEW DETAILS */
-function showDetails(index) {
-  const movie = getMovies()[index];
+/* TOGGLE DETAILS */
+function toggleDetails(index, btn) {
+  const details = document.getElementById(`details-${index}`);
 
-  alert(
-`Title: ${movie.title}
-Genre: ${movie.genre}
-Runtime: ${movie.runtime} minutes
-Description: ${movie.description}`
-  );
+  if (details.style.display === "none") {
+    details.style.display = "block";
+    btn.textContent = "Hide Details";
+  } else {
+    details.style.display = "none";
+    btn.textContent = "View Details";
+  }
 }
 
 /* FILTERS */
@@ -193,10 +202,26 @@ function loadCart() {
   });
 }
 
-/* DELETE */
+/* DELETE MOVIE + REMOVE FROM CART */
 function deleteMovie(index) {
   const movies = getMovies();
+  const cart = getCart();
+
+  const removedMovie = movies[index];
+
+  // Remove from schedule
   movies.splice(index, 1);
   saveMovies(movies);
+
+  // Remove from cart
+  const updatedCart = cart.filter(item =>
+    !(item.title === removedMovie.title &&
+      item.time === removedMovie.time &&
+      item.date === removedMovie.date &&
+      item.location === removedMovie.location)
+  );
+
+  saveCart(updatedCart);
+
   loadMovies();
 }
