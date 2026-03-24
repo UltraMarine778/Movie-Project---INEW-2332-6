@@ -21,8 +21,8 @@
       <div id="loginSection" class="admin-box">
         <h2>Admin Login</h2>
 
-        <label for="adminPassword">Password</label>
-        <input type="password" id="adminPassword" placeholder="Enter Password">
+        <label>Password</label>
+        <input type="password" id="adminPassword">
 
         <button id="loginBtn">Login</button>
         <p id="loginMessage"></p>
@@ -31,24 +31,32 @@
       <div id="adminPanel" class="admin-box" style="display:none;">
         <h2>Schedule Showtimes</h2>
 
-        <label for="movieTitle">Movie Title</label>
-        <input type="text" id="movieTitle" placeholder="Movie Title">
+        <label>Movie Title</label>
+        <input type="text" id="movieTitle">
 
-        <label for="movieTime">Showtime</label>
-        <input type="text" id="movieTime" placeholder="Showtime (7:00 PM)">
+        <label>Description</label>
+        <input type="text" id="movieDescription">
 
-        <label for="movieDate">Date</label>
+        <label>Genre</label>
+        <input type="text" id="movieGenre">
+
+        <label>Runtime (minutes)</label>
+        <input type="number" id="movieRuntime">
+
+        <label>Showtime</label>
+        <input type="text" id="movieTime">
+
+        <label>Date</label>
         <input type="date" id="movieDate">
 
-        <label for="movieLocation">Theater Location</label>
+        <label>Location</label>
         <select id="movieLocation">
-          <option value="North Theater">North Theater</option>
-          <option value="Downtown Theater">Downtown Theater</option>
-          <option value="West Theater">West Theater</option>
+          <option>North Theater</option>
+          <option>Downtown Theater</option>
+          <option>West Theater</option>
         </select>
 
         <button id="addMovieBtn">Add Movie</button>
-
         <p id="adminMessage"></p>
 
         <h3>Current Schedule</h3>
