@@ -36,6 +36,13 @@ nav {
   text-align: center;
 }
 
+.movie-details {
+  background: #f0f4ff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 8px;
+}
+
 /* HOME TITLE / HERO */
 .home-title {
   font-size: 48px;
