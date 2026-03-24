@@ -128,9 +128,14 @@ li {
   width: 60%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   border-radius: 6px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+li > div:first-child {
+  text-align: left;
+  width: 100%;
 }
 
 /* FOOTER */
