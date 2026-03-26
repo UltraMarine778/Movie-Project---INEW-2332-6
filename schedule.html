@@ -3,8 +3,12 @@
 <head>
     <title>Schedule - TwoKies</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- FIX: use defer -->
+    <script src="script.js" defer></script>
 </head>
-<body onload="loadMovies()">
+
+<body>
     <header>
         <nav>
             <div class="brand">TwoKies</div>
@@ -23,6 +27,7 @@
             <div class="filters">
                 <label>Filter by Date</label>
                 <input type="date" id="filterDate">
+
                 <label>Filter by Location</label>
                 <select id="filterLocation">
                     <option value="">All Locations</option>
@@ -30,9 +35,11 @@
                     <option value="Downtown Theater">Downtown Theater</option>
                     <option value="West Theater">West Theater</option>
                 </select>
+
                 <button onclick="applyFilters()">Filter</button>
             </div>
 
+            
             <ul id="scheduleList"></ul>
 
             <h3>Your Cart</h3>
@@ -47,12 +54,5 @@
     <footer>
         <p>© 2026 TwoKies Cinema</p>
     </footer>
-
-    <script src="script.js"></script>
-    <script>
-    window.addEventListener("focus", () => {
-        loadMovies();
-    });
-    </script>
 </body>
 </html>
