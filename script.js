@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (boxOfficeSellBtn) boxOfficeSellBtn.addEventListener("click", processBoxOfficeSale);
 
     loadMovies();
+
+    window.addEventListener("storage", () => loadMovies());
 });
 
 // ---------- LOGIN ----------
