@@ -1,56 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Schedule - TwoKies</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Schedule - TwoKies</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body onload="loadMovies()">
-  <header>
-    <nav>
-      <div class="brand">TwoKies</div>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="schedule.html">View Schedule</a>
-        <a href="admin.html">Admin</a>
-      </div>
-    </nav>
-  </header>
+    <header>
+        <nav>
+            <div class="brand">TwoKies</div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="schedule.html">View Schedule</a>
+                <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+    </header>
 
-  <main>
-    <div class="container">
-      <h2>Movie Schedule</h2>
+    <main>
+        <div class="container">
+            <h2>Movie Schedule</h2>
 
+            <div class="filters">
+                <label>Filter by Date</label>
+                <input type="date" id="filterDate">
+                <label>Filter by Location</label>
+                <select id="filterLocation">
+                    <option value="">All Locations</option>
+                    <option value="North Theater">North Theater</option>
+                    <option value="Downtown Theater">Downtown Theater</option>
+                    <option value="West Theater">West Theater</option>
+                </select>
+                <button onclick="applyFilters()">Filter</button>
+            </div>
 
-      <div class="filters">
+            <ul id="scheduleList"></ul>
 
-        <label>Filter by Date</label>
-        <input type="date" id="filterDate">
+            <h3>Your Cart</h3>
+            <ul id="cartList"></ul>
 
-        <label>Filter by Location</label>
-        <select id="filterLocation">
-          <option value="">All Locations</option>
-          <option value="North Theater">North Theater</option>
-          <option value="Downtown Theater">Downtown Theater</option>
-          <option value="West Theater">West Theater</option>
-        </select>
+            <button id="checkoutBtn" onclick="checkout()">Purchase</button>
 
-        <button onclick="applyFilters()">Filter</button>
+            <div id="purchaseConfirmation"></div>
+        </div>
+    </main>
 
-      </div>
+    <footer>
+        <p>© 2026 TwoKies Cinema</p>
+    </footer>
 
-      <ul id="scheduleList"></ul>
-
-
-      <h3>Your Cart</h3>
-      <ul id="cartList"></ul>
-
-    </div>
-  </main>
-
-  <footer>
-    <p>&copy; 2026 TwoKies Cinema</p>
-  </footer>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
