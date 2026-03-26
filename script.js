@@ -146,14 +146,19 @@ function loadMovies() {
     populateBoxOfficeShowtimes();
 }
 
-// ---------- DISPLAY SCHEDULE ----------
+// ---------- DISPLAY SCHEDULE WITH DETAILS & QUANTITY ----------
 function displaySchedule(movies) {
     const list = document.getElementById("scheduleList");
     if (!list) return;
 
     list.innerHTML = "";
 
-    movies.forEach(movie => {
+    if (movies.length === 0) {
+        list.innerHTML = "<li>No movies scheduled.</li>";
+        return;
+    }
+
+    movies.forEach((movie) => {
         const remaining = movie.capacity - (movie.ticketsSold || 0);
         const soldOut = remaining <= 0;
 
@@ -163,15 +168,37 @@ function displaySchedule(movies) {
                 <strong>${movie.title}</strong><br>
                 ${movie.time} - ${movie.date} - ${movie.location}
                 ${soldOut ? '<span class="sold-out">Sold Out</span>' : ''}
+                <div id="details-${movie.id}" class="movie-details" style="display:none;">
+                    <p><strong>Genre:</strong> ${movie.genre}</p>
+                    <p><strong>Runtime:</strong> ${movie.runtime} minutes</p>
+                    <p><strong>Description:</strong> ${movie.description}</p>
+                    <p><strong>Capacity:</strong> ${movie.capacity}</p>
+                    <p><strong>Remaining Seats:</strong> ${remaining}</p>
+                </div>
             </div>
             <div>
-                <label>Qty</label>
-                <input type="number" id="qty-${movie.id}" min="1" max="${remaining}" value="1" ${soldOut ? "disabled" : ""}>
+                <button onclick="toggleDetails(${movie.id}, this)">View Details</button><br><br>
+                <label for="qty-${movie.id}">Qty</label>
+                <input type="number" id="qty-${movie.id}" min="1" ${!soldOut ? `max="${remaining}" value="1"` : 'value="0"'} ${soldOut ? "disabled" : ""}>
                 <button onclick="addToCart(${movie.id})" ${soldOut ? "disabled" : ""}>Add Ticket</button>
             </div>
         `;
         list.appendChild(li);
     });
+}
+
+// ---------- TOGGLE DETAILS ----------
+function toggleDetails(id, btn) {
+    const details = document.getElementById(`details-${id}`);
+    if (!details) return;
+
+    if (details.style.display === "none") {
+        details.style.display = "block";
+        btn.textContent = "Hide Details";
+    } else {
+        details.style.display = "none";
+        btn.textContent = "View Details";
+    }
 }
 
 // ---------- CART ----------
