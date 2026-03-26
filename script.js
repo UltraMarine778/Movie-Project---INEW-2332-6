@@ -366,3 +366,20 @@ function deleteMovie(index) {
 
     loadMovies();
 }
+
+function applyFilters() {
+    const date = document.getElementById("filterDate").value;
+    const location = document.getElementById("filterLocation").value;
+
+    let movies = getMovies();
+
+    if (date) {
+        movies = movies.filter(m => m.date === date);
+    }
+
+    if (location) {
+        movies = movies.filter(m => m.location === location);
+    }
+
+    displaySchedule(movies);
+}
