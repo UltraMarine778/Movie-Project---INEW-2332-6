@@ -28,7 +28,7 @@ function checkPassword() {
     }
 }
 
-// ---------- STORAGE HELPERS ----------
+// ---------- STORAGE ----------
 function getMovies() {
     return JSON.parse(localStorage.getItem("movies")) || [];
 }
@@ -50,13 +50,7 @@ function saveTickets(tickets) {
     localStorage.setItem("tickets", JSON.stringify(tickets));
 }
 
-// ---------- UTILS ----------
-function generateConfirmationCode() {
-    // Simple unique code
-    return "TK-" + Date.now().toString(36).toUpperCase();
-}
-
-// ---------- ADD MOVIE (ADMIN) ----------
+// ---------- ADD MOVIE ----------
 function addMovie() {
     const title = document.getElementById("movieTitle").value.trim();
     const description = document.getElementById("movieDescription").value.trim();
@@ -75,17 +69,21 @@ function addMovie() {
         return;
     }
 
-    const capacity = parseInt(capacityValue, 10);
+    let capacity = parseInt(capacityValue, 10);
+
     if (isNaN(capacity) || capacity <= 0) {
-        msg.textContent = "Capacity must be a positive number.";
+        msg.textContent = "Capacity must be valid.";
         msg.style.color = "red";
         return;
     }
 
+    // ✅ LIMIT TO 30
+    if (capacity > 30) capacity = 30;
+
     const movies = getMovies();
 
     const newMovie = {
-        id: Date.now(),             // unique showtime ID
+        id: Date.now(),
         title,
         description,
         genre,
@@ -100,7 +98,6 @@ function addMovie() {
     movies.push(newMovie);
     saveMovies(movies);
 
-    // Clear inputs
     document.getElementById("movieTitle").value = "";
     document.getElementById("movieDescription").value = "";
     document.getElementById("movieGenre").value = "";
@@ -115,61 +112,48 @@ function addMovie() {
     loadMovies();
 }
 
-// ---------- LOAD MOVIES (BOTH ADMIN & SCHEDULE) ----------
+// ---------- LOAD MOVIES ----------
 function loadMovies() {
     const movieList = document.getElementById("movieList");
     const scheduleList = document.getElementById("scheduleList");
     const movies = getMovies();
 
-    // Admin movie list
     if (movieList) {
         movieList.innerHTML = "";
-        if (movies.length === 0) {
-            movieList.innerHTML = "<li>No movies scheduled.</li>";
-        } else {
-            movies.forEach((movie, index) => {
-                const remaining = movie.capacity - (movie.ticketsSold || 0);
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <div>
-                        <strong>${movie.title}</strong><br>
-                        ${movie.time} - ${movie.date} - ${movie.location}<br>
-                        Capacity: ${movie.capacity} |
-                        Sold: ${movie.ticketsSold || 0} |
-                        Remaining: ${remaining}
-                    </div>
-                    <button onclick="deleteMovie(${index})">Delete</button>
-                `;
-                movieList.appendChild(li);
-            });
-        }
+        movies.forEach((movie, index) => {
+            const remaining = movie.capacity - (movie.ticketsSold || 0);
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <div>
+                    <strong>${movie.title}</strong><br>
+                    ${movie.time} - ${movie.date} - ${movie.location}<br>
+                    Capacity: ${movie.capacity} |
+                    Sold: ${movie.ticketsSold || 0} |
+                    Remaining: ${remaining}
+                </div>
+                <button onclick="deleteMovie(${index})">Delete</button>
+            `;
+            movieList.appendChild(li);
+        });
     }
 
-    // Public schedule list
     if (scheduleList) {
         displaySchedule(movies);
     }
 
-    // Cart for schedule page
     loadCart();
-
-    // Box office dropdown (admin page)
     populateBoxOfficeShowtimes();
 }
 
-// ---------- DISPLAY SCHEDULE WITH DETAILS & QUANTITY ----------
+// ---------- DISPLAY SCHEDULE ----------
 function displaySchedule(movies) {
     const list = document.getElementById("scheduleList");
     if (!list) return;
 
     list.innerHTML = "";
 
-    if (movies.length === 0) {
-        list.innerHTML = "<li>No movies scheduled.</li>";
-        return;
-    }
-
-    movies.forEach((movie) => {
+    movies.forEach(movie => {
         const remaining = movie.capacity - (movie.ticketsSold || 0);
         const soldOut = remaining <= 0;
 
@@ -179,18 +163,10 @@ function displaySchedule(movies) {
                 <strong>${movie.title}</strong><br>
                 ${movie.time} - ${movie.date} - ${movie.location}
                 ${soldOut ? '<span class="sold-out">Sold Out</span>' : ''}
-                <div id="details-${movie.id}" class="movie-details" style="display:none;">
-                    <p><strong>Genre:</strong> ${movie.genre}</p>
-                    <p><strong>Runtime:</strong> ${movie.runtime} minutes</p>
-                    <p><strong>Description:</strong> ${movie.description}</p>
-                    <p><strong>Capacity:</strong> ${movie.capacity}</p>
-                    <p><strong>Remaining Seats:</strong> ${remaining}</p>
-                </div>
             </div>
             <div>
-                <button onclick="toggleDetails(${movie.id}, this)">View Details</button><br><br>
-                <label for="qty-${movie.id}">Qty</label>
-                <input type="number" id="qty-${movie.id}" min="1" ${!soldOut ? `max="${remaining}" value="1"` : 'value="0"'} ${soldOut ? "disabled" : ""}>
+                <label>Qty</label>
+                <input type="number" id="qty-${movie.id}" min="1" max="${remaining}" value="1" ${soldOut ? "disabled" : ""}>
                 <button onclick="addToCart(${movie.id})" ${soldOut ? "disabled" : ""}>Add Ticket</button>
             </div>
         `;
@@ -198,85 +174,43 @@ function displaySchedule(movies) {
     });
 }
 
-// ---------- TOGGLE DETAILS ----------
-function toggleDetails(id, btn) {
-    const details = document.getElementById(`details-${id}`);
-    if (!details) return;
-
-    if (details.style.display === "none") {
-        details.style.display = "block";
-        btn.textContent = "Hide Details";
-    } else {
-        details.style.display = "none";
-        btn.textContent = "View Details";
-    }
-}
-
-// ---------- FILTERS ----------
-function applyFilters() {
-    const date = document.getElementById("filterDate").value;
-    const location = document.getElementById("filterLocation").value;
-    let movies = getMovies();
-
-    if (date) movies = movies.filter(m => m.date === date);
-    if (location) movies = movies.filter(m => m.location === location);
-
-    displaySchedule(movies);
-}
-
-// ---------- CART (ONLINE) ----------
+// ---------- CART ----------
 function addToCart(showtimeId) {
     const qtyInput = document.getElementById(`qty-${showtimeId}`);
-    if (!qtyInput) {
-        alert("Quantity input not found.");
-        return;
-    }
-
     let quantity = parseInt(qtyInput.value, 10);
-    if (isNaN(quantity) || quantity <= 0) {
-        alert("Please enter a valid ticket quantity.");
-        return;
-    }
 
     const movies = getMovies();
     const movie = movies.find(m => m.id === showtimeId);
-    if (!movie) {
-        alert("Showtime not found.");
-        return;
-    }
 
     const remaining = movie.capacity - (movie.ticketsSold || 0);
 
-    // Check against remaining seats
     const cart = getCart();
     const existing = cart.find(item => item.showtimeId === showtimeId);
-    const alreadyInCart = existing ? existing.quantity : 0;
+    const already = existing ? existing.quantity : 0;
 
-    if (quantity + alreadyInCart > remaining) {
-        alert(`Only ${remaining - alreadyInCart} more tickets can be added to the cart for this showtime.`);
+    if (quantity + already > remaining) {
+        alert("Not enough tickets available.");
         return;
     }
 
     if (existing) {
         existing.quantity += quantity;
     } else {
-        cart.push({
-            showtimeId: showtimeId,
-            quantity: quantity
-        });
+        cart.push({ showtimeId, quantity });
     }
 
     saveCart(cart);
     loadCart();
-    alert("Ticket(s) added!");
 }
 
+// ✅ LOAD CART WITH REMOVE BUTTON
 function loadCart() {
     const list = document.getElementById("cartList");
     if (!list) return;
 
     const cart = getCart();
     const movies = getMovies();
+
     list.innerHTML = "";
 
     if (cart.length === 0) {
@@ -284,24 +218,31 @@ function loadCart() {
         return;
     }
 
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
         const movie = movies.find(m => m.id === item.showtimeId);
         if (!movie) return;
 
         const li = document.createElement("li");
-        li.textContent = `${movie.title} - ${movie.time} - ${movie.location} (Qty: ${item.quantity})`;
+        li.innerHTML = `
+            ${movie.title} - ${movie.time} - ${movie.location} (Qty: ${item.quantity})
+            <button onclick="removeFromCart(${index})">Remove</button>
+        `;
         list.appendChild(li);
     });
 }
 
-// ---------- CHECKOUT (ONLINE PURCHASE) ----------
+// ✅ REMOVE ITEM
+function removeFromCart(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+    loadCart();
+}
+
+// ---------- CHECKOUT ----------
 function checkout() {
     const cart = getCart();
     const confirmationDiv = document.getElementById("purchaseConfirmation");
-
-    if (confirmationDiv) {
-        confirmationDiv.innerHTML = "";
-    }
 
     if (!cart || cart.length === 0) {
         alert("Your cart is empty.");
@@ -310,65 +251,30 @@ function checkout() {
 
     const movies = getMovies();
 
-    // First pass: verify capacity for all items
     for (const item of cart) {
         const movie = movies.find(m => m.id === item.showtimeId);
-        if (!movie) {
-            alert("A showtime in your cart no longer exists.");
-            return;
-        }
         const remaining = movie.capacity - (movie.ticketsSold || 0);
+
         if (item.quantity > remaining) {
-            alert(`Not enough seats left for ${movie.title}. Remaining: ${remaining}`);
+            alert(`Not enough seats for ${movie.title}`);
             return;
         }
     }
-
-    // All good – create tickets and update capacity
-    const tickets = getTickets();
-    const confirmationCode = generateConfirmationCode();
-    const purchaseDetails = [];
 
     cart.forEach(item => {
         const movie = movies.find(m => m.id === item.showtimeId);
-        const quantity = item.quantity;
-
-        movie.ticketsSold = (movie.ticketsSold || 0) + quantity;
-
-        tickets.push({
-            confirmationCode,
-            showtimeId: movie.id,
-            quantity,
-            channel: "online",
-            timestamp: new Date().toISOString()
-        });
-
-        purchaseDetails.push(
-            `${movie.title} - ${movie.date} ${movie.time} @ ${movie.location} (Qty: ${quantity})`
-        );
+        movie.ticketsSold += item.quantity;
     });
 
     saveMovies(movies);
-    saveTickets(tickets);
     saveCart([]);
     loadCart();
-    loadMovies(); // Refresh remaining seats / sold-out
+    loadMovies();
 
-    if (confirmationDiv) {
-        const detailsHtml = purchaseDetails.map(d => `<li>${d}</li>`).join("");
-        confirmationDiv.innerHTML = `
-            <h4>Purchase Complete!</h4>
-            <p>Your confirmation code:</p>
-            <p><strong>${confirmationCode}</strong></p>
-            <p>Show this code at the theater to receive your tickets.</p>
-            <ul>${detailsHtml}</ul>
-        `;
-    } else {
-        alert(`Purchase complete! Confirmation code: ${confirmationCode}`);
-    }
+    confirmationDiv.innerHTML = "<h4>Purchase Successful</h4>";
 }
 
-// ---------- BOX OFFICE FLOW (EMPLOYEE) ----------
+// ---------- BOX OFFICE ----------
 function populateBoxOfficeShowtimes() {
     const select = document.getElementById("boxOfficeShowtime");
     if (!select) return;
@@ -376,26 +282,15 @@ function populateBoxOfficeShowtimes() {
     const movies = getMovies();
     select.innerHTML = "";
 
-    if (movies.length === 0) {
-        const opt = document.createElement("option");
-        opt.textContent = "No showtimes available";
-        opt.disabled = true;
-        opt.selected = true;
-        select.appendChild(opt);
-        return;
-    }
-
     movies.forEach(movie => {
         const remaining = movie.capacity - (movie.ticketsSold || 0);
+
         const opt = document.createElement("option");
         opt.value = movie.id;
-        
-        let text = `${movie.title} - ${movie.date} ${movie.time} @ ${movie.location} (Remaining: ${remaining})`;
-        if (remaining <= 0) {
-            text += " [SOLD OUT]";
-            opt.disabled = true;
-        }
-        opt.textContent = text;
+        opt.textContent = `${movie.title} (${remaining} left)`;
+
+        if (remaining <= 0) opt.disabled = true;
+
         select.appendChild(opt);
     });
 }
@@ -405,82 +300,40 @@ function processBoxOfficeSale() {
     const qtyInput = document.getElementById("boxOfficeQuantity");
     const msg = document.getElementById("boxOfficeMessage");
 
-    if (!select || !qtyInput || !msg) return;
-
-    const showtimeId = parseInt(select.value, 10);
-    let quantity = parseInt(qtyInput.value, 10);
-
-    if (isNaN(showtimeId)) {
-        msg.textContent = "Please select a valid showtime.";
-        msg.style.color = "red";
-        return;
-    }
-
-    if (isNaN(quantity) || quantity <= 0) {
-        msg.textContent = "Enter a valid ticket quantity.";
-        msg.style.color = "red";
-        return;
-    }
+    const showtimeId = parseInt(select.value);
+    const quantity = parseInt(qtyInput.value);
 
     const movies = getMovies();
     const movie = movies.find(m => m.id === showtimeId);
 
-    if (!movie) {
-        msg.textContent = "Showtime not found.";
-        msg.style.color = "red";
-        return;
-    }
-
     const remaining = movie.capacity - (movie.ticketsSold || 0);
+
     if (quantity > remaining) {
-        msg.textContent = `Only ${remaining} tickets remaining for this showtime.`;
+        msg.textContent = "Not enough tickets.";
         msg.style.color = "red";
         return;
     }
 
-    const tickets = getTickets();
-    const confirmationCode = generateConfirmationCode();
-
-    movie.ticketsSold = (movie.ticketsSold || 0) + quantity;
-    tickets.push({
-        confirmationCode,
-        showtimeId: movie.id,
-        quantity,
-        channel: "boxOffice",
-        timestamp: new Date().toISOString()
-    });
+    movie.ticketsSold += quantity;
 
     saveMovies(movies);
-    saveTickets(tickets);
 
-    msg.textContent = `Sale complete! Confirmation code: ${confirmationCode}`;
+    msg.textContent = "Sale complete!";
     msg.style.color = "green";
 
-    qtyInput.value = "1";
-
-    loadMovies(); // Refresh schedule and box office dropdown
+    loadMovies();
 }
 
 // ---------- DELETE MOVIE ----------
 function deleteMovie(index) {
     const movies = getMovies();
     const cart = getCart();
-    const tickets = getTickets();
 
-    const removedMovie = movies[index];
-    if (!removedMovie) return;
-
-    // Remove from movies
+    const removed = movies[index];
     movies.splice(index, 1);
+
     saveMovies(movies);
-
-    // Remove from cart
-    const updatedCart = cart.filter(item => item.showtimeId !== removedMovie.id);
-    saveCart(updatedCart);
-
-    // Remove tickets for that showtime
-    const updatedTickets = tickets.filter(t => t.showtimeId !== removedMovie.id);
-    saveTickets(updatedTickets);
+    saveCart(cart.filter(c => c.showtimeId !== removed.id));
 
     loadMovies();
 }
