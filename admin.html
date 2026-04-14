@@ -1,89 +1,69 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin - TwoKies</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <nav>
-            <div class="brand">TwoKies</div>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="schedule.html">View Schedule</a>
-                <a href="admin.html">Admin</a>
-            </div>
-        </nav>
-    </header>
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin-box" style="display:none;">
+    <h2>Admin Dashboard</h2>
 
-    <main>
-        <div class="container">
+    <button onclick="showSection('moviesSection')">Create Movies</button>
+    <button onclick="showSection('scheduleSection')">Schedule Showtimes</button>
+    <button onclick="showSection('reportSection')">Reports</button>
 
-            <!-- LOGIN SECTION -->
-            <div id="loginSection" class="admin-box">
-                <h2>Admin Login</h2>
-                <label>Password</label>
-                <input type="password" id="adminPassword">
-                <button id="loginBtn">Login</button>
-                <p id="loginMessage"></p>
-            </div>
+    <!-- CREATE MOVIES -->
+    <div id="moviesSection" style="display:none;">
+        <h3>Create Movie</h3>
 
-            <!-- ADMIN PANEL -->
-            <div id="adminPanel" class="admin-box" style="display:none;">
-                <h2>Schedule Showtimes</h2>
+        <label>Movie Title</label>
+        <input type="text" id="movieTitle">
 
-                <label>Movie Title</label>
-                <input type="text" id="movieTitle">
+        <label>Description</label>
+        <input type="text" id="movieDescription">
 
-                <label>Description</label>
-                <input type="text" id="movieDescription">
+        <label>Genre</label>
+        <input type="text" id="movieGenre">
 
-                <label>Genre</label>
-                <input type="text" id="movieGenre">
+        <label>Runtime</label>
+        <input type="number" id="movieRuntime">
 
-                <label>Runtime (minutes)</label>
-                <input type="number" id="movieRuntime">
+        <button onclick="addMovieDefinition()">Save Movie</button>
+        <p id="movieMsg"></p>
+    </div>
 
-                <label>Showtime</label>
-                <input type="text" id="movieTime">
+    <!-- SCHEDULE SHOWTIMES -->
+    <div id="scheduleSection" style="display:none;">
+        <h3>Schedule Showtime</h3>
 
-                <label>Date</label>
-                <input type="date" id="movieDate">
+        <label>Select Movie</label>
+        <select id="movieSelect"></select>
 
-                <label>Location</label>
-                <select id="movieLocation">
-                    <option>North Theater</option>
-                    <option>Downtown Theater</option>
-                    <option>West Theater</option>
-                </select>
+        <label>Date</label>
+        <input type="date" id="movieDate">
 
-                <label>Capacity (number of seats)</label>
-                <input type="number" id="movieCapacity" min="1">
+        <label>Time</label>
+        <input type="text" id="movieTime">
 
-                <button id="addMovieBtn">Add Movie</button>
-                <p id="adminMessage"></p>
+        <label>Theater</label>
+        <select id="theaterSelect"></select>
 
-                <h3>Current Schedule</h3>
-                <ul id="movieList"></ul>
+        <label>Capacity</label>
+        <input type="number" id="movieCapacity">
 
-                <h3>Box Office Sales</h3>
-                <label>Select Showtime</label>
-                <select id="boxOfficeShowtime"></select>
+        <button onclick="scheduleMovie()">Schedule</button>
 
-                <label>Ticket Quantity</label>
-                <input type="number" id="boxOfficeQuantity" min="1" value="1">
+        <h4>Add Theater</h4>
+        <input type="text" id="newTheaterName">
+        <button onclick="addTheater()">Add Theater</button>
+    </div>
 
-                <button id="boxOfficeSellBtn">Sell Tickets</button>
-                <p id="boxOfficeMessage"></p>
-            </div>
+    <!-- REPORTS -->
+    <div id="reportSection" style="display:none;">
+        <h3>Sales Report</h3>
 
-        </div>
-    </main>
+        <label>Start Date</label>
+        <input type="date" id="reportStart">
 
-    <footer>
-        <p>© 2026 TwoKies Cinema</p>
-    </footer>
+        <label>End Date</label>
+        <input type="date" id="reportEnd">
 
-    <script src="script.js"></script>
-</body>
-</html>
+        <button onclick="generateReport()">Generate Report</button>
+
+        <ul id="reportResults"></ul>
+    </div>
+</div>
