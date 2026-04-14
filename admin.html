@@ -1,69 +1,87 @@
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="admin-box" style="display:none;">
-    <h2>Admin Dashboard</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - TwoKies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">View Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
+    </nav>
+</header>
 
-    <button onclick="showSection('moviesSection')">Create Movies</button>
-    <button onclick="showSection('scheduleSection')">Schedule Showtimes</button>
-    <button onclick="showSection('reportSection')">Reports</button>
+<main>
+<div class="container">
 
-    <!-- CREATE MOVIES -->
-    <div id="moviesSection" style="display:none;">
-        <h3>Create Movie</h3>
-
-        <label>Movie Title</label>
-        <input type="text" id="movieTitle">
-
-        <label>Description</label>
-        <input type="text" id="movieDescription">
-
-        <label>Genre</label>
-        <input type="text" id="movieGenre">
-
-        <label>Runtime</label>
-        <input type="number" id="movieRuntime">
-
-        <button onclick="addMovieDefinition()">Save Movie</button>
-        <p id="movieMsg"></p>
+    <!-- LOGIN -->
+    <div id="loginSection" class="admin-box">
+        <h2>Admin Login</h2>
+        <input type="password" id="adminPassword" placeholder="Password">
+        <button onclick="checkPassword()">Login</button>
+        <p id="loginMessage"></p>
     </div>
 
-    <!-- SCHEDULE SHOWTIMES -->
-    <div id="scheduleSection" style="display:none;">
-        <h3>Schedule Showtime</h3>
+    <!-- DASHBOARD -->
+    <div id="adminPanel" class="admin-box" style="display:none;">
+        <h2>Admin Dashboard</h2>
 
-        <label>Select Movie</label>
-        <select id="movieSelect"></select>
+        <button onclick="showSection('moviesSection')">Create Movies</button>
+        <button onclick="showSection('scheduleSection')">Schedule Showtimes</button>
+        <button onclick="showSection('reportSection')">Reports</button>
 
-        <label>Date</label>
-        <input type="date" id="movieDate">
+        <!-- CREATE MOVIES -->
+        <div id="moviesSection" style="display:none;">
+            <h3>Create Movie</h3>
+            <input id="movieTitle" placeholder="Title">
+            <input id="movieDescription" placeholder="Description">
+            <input id="movieGenre" placeholder="Genre">
+            <input id="movieRuntime" type="number" placeholder="Runtime">
+            <button onclick="addMovieDefinition()">Save Movie</button>
+            <p id="movieMsg"></p>
+        </div>
 
-        <label>Time</label>
-        <input type="text" id="movieTime">
+        <!-- SCHEDULE -->
+        <div id="scheduleSection" style="display:none;">
+            <h3>Schedule Showtime</h3>
 
-        <label>Theater</label>
-        <select id="theaterSelect"></select>
+            <select id="movieSelect"></select>
+            <input type="date" id="movieDate">
+            <input id="movieTime" placeholder="Time">
+            <select id="theaterSelect"></select>
+            <input type="number" id="movieCapacity" placeholder="Capacity">
 
-        <label>Capacity</label>
-        <input type="number" id="movieCapacity">
+            <button onclick="scheduleMovie()">Schedule</button>
 
-        <button onclick="scheduleMovie()">Schedule</button>
+            <h4>Add Theater</h4>
+            <input id="newTheaterName" placeholder="New Theater">
+            <button onclick="addTheater()">Add Theater</button>
+        </div>
 
-        <h4>Add Theater</h4>
-        <input type="text" id="newTheaterName">
-        <button onclick="addTheater()">Add Theater</button>
-    </div>
+        <!-- REPORTS -->
+        <div id="reportSection" style="display:none;">
+            <h3>Sales Report</h3>
 
-    <!-- REPORTS -->
-    <div id="reportSection" style="display:none;">
-        <h3>Sales Report</h3>
+            <input type="date" id="reportStart">
+            <input type="date" id="reportEnd">
+            <button onclick="generateReport()">Generate</button>
 
-        <label>Start Date</label>
-        <input type="date" id="reportStart">
+            <ul id="reportResults"></ul>
+        </div>
 
-        <label>End Date</label>
-        <input type="date" id="reportEnd">
-
-        <button onclick="generateReport()">Generate Report</button>
-
-        <ul id="reportResults"></ul>
     </div>
 </div>
+</main>
+
+<footer>
+    <p>© 2026 TwoKies Cinema</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
