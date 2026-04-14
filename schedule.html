@@ -1,2 +1,43 @@
-<h3>Select Theater</h3>
-<select id="theaterFilter" onchange="filterByTheater()"></select>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule - TwoKies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="loadMovies()">
+
+<header>
+    <nav>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">View Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+<div class="container">
+
+    <h2>Select Theater</h2>
+    <select id="theaterFilter" onchange="filterByTheater()"></select>
+
+    <ul id="scheduleList"></ul>
+
+    <h3>Your Cart</h3>
+    <ul id="cartList"></ul>
+    <button onclick="checkout()">Purchase</button>
+
+    <div id="purchaseConfirmation"></div>
+
+</div>
+</main>
+
+<footer>
+    <p>© 2026 TwoKies Cinema</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
