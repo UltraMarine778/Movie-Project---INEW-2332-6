@@ -7,20 +7,19 @@
 <body>
 
 <header>
-    <nav>
-        <div class="brand">TwoKies</div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="schedule.html">View Schedule</a>
-            <a href="admin.html">Admin</a>
-        </div>
-    </nav>
+<nav>
+    <div class="brand">TwoKies</div>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="schedule.html">View Schedule</a>
+        <a href="admin.html">Admin</a>
+    </div>
+</nav>
 </header>
 
 <main>
 <div class="container">
 
-<!-- LOGIN -->
 <div id="loginSection" class="admin-box">
     <h2>Admin Login</h2>
     <input type="password" id="adminPassword">
@@ -28,28 +27,25 @@
     <p id="loginMessage"></p>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="adminPanel" class="admin-box" style="display:none;">
-
     <h2>Admin Dashboard</h2>
 
     <button onclick="showSection('moviesSection')">Create Movies</button>
     <button onclick="showSection('scheduleSection')">Schedule Showtimes</button>
     <button onclick="showSection('reportSection')">Reports</button>
 
-    <!-- MOVIE CREATION -->
+    <!-- MOVIES -->
     <div id="moviesSection" style="display:none;">
         <h3>Create Movie</h3>
         <input id="movieTitle" placeholder="Title">
         <input id="movieDescription" placeholder="Description">
         <input id="movieGenre" placeholder="Genre">
         <input id="movieRuntime" type="number" placeholder="Runtime">
-
-        <button onclick="addMovieDefinition()">Save Movie</button>
+        <button onclick="addMovieDefinition()">Save</button>
         <p id="movieMsg"></p>
     </div>
 
-    <!-- SCHEDULING -->
+    <!-- SCHEDULE -->
     <div id="scheduleSection" style="display:none;">
         <h3>Schedule Showtime</h3>
 
@@ -62,20 +58,20 @@
         <button onclick="scheduleMovie()">Schedule</button>
 
         <h4>Add Theater</h4>
-        <input id="newTheaterName" placeholder="Theater Name">
-        <button onclick="addTheater()">Add Theater</button>
+        <input id="newTheaterName">
+        <button onclick="addTheater()">Add</button>
 
         <h4>Deactivate Theater</h4>
         <select id="theaterDeactivate"></select>
-        <button onclick="toggleSelectedTheater()">Toggle Active</button>
+        <button onclick="toggleSelectedTheater()">Toggle</button>
 
         <h4>Box Office</h4>
         <select id="boxOfficeShowtime"></select>
         <input type="number" id="boxOfficeQuantity" value="1">
-        <button onclick="processBoxOfficeSale()">Sell Tickets</button>
+        <button onclick="processBoxOfficeSale()">Sell</button>
     </div>
 
-    <!-- REPORTS -->
+    <!-- REPORT -->
     <div id="reportSection" style="display:none;">
         <h3>Sales Report</h3>
         <input type="date" id="reportStart">
@@ -89,7 +85,7 @@
 </main>
 
 <footer>
-    <p>© 2026 TwoKies Cinema</p>
+<p>© 2026 TwoKies Cinema</p>
 </footer>
 
 <script src="script.js"></script>
