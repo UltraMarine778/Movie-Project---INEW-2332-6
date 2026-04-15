@@ -1,32 +1,53 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Schedule - TwoKies</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Schedule - TwoKies</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body onload="loadMovies()">
-  <header>
+<body>
+<header>
     <nav>
-      <div class="brand">TwoKies</div>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="schedule.html">View Schedule</a>
-        <a href="admin.html">Admin</a>
-      </div>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">View Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
     </nav>
-  </header>
+</header>
 
-  <main>
+<main>
     <div class="container">
-      <h2>Movie Schedule</h2>
-      <ul id="scheduleList"></ul>
+        <h2>Movie Schedule</h2>
+
+        <div class="filters">
+            <label>Select Theater (required)</label>
+            <select id="viewerTheater">
+                <option value="">-- Choose Theater --</option>
+            </select>
+
+            <label>Optional: Filter by Date</label>
+            <input type="date" id="viewerDate">
+
+            <button id="viewerFilterBtn">Show Schedule</button>
+        </div>
+
+        <ul id="scheduleList"></ul>
+
+        <h3>Your Cart</h3>
+        <ul id="cartList"></ul>
+
+        <button id="checkoutBtn">Purchase</button>
+
+        <div id="purchaseConfirmation"></div>
     </div>
-  </main>
+</main>
 
-  <footer>
-    <p>&copy; 2026 TwoKies Cinema</p>
-  </footer>
+<footer>
+    <p>© 2026 TwoKies Cinema</p>
+</footer>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
