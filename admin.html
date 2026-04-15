@@ -1,56 +1,158 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin - TwoKies</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Admin - TwoKies</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+<header>
     <nav>
-      <div class="brand">TwoKies</div>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="schedule.html">View Schedule</a>
-        <a href="admin.html">Admin</a>
-      </div>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">View Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
     </nav>
-  </header>
+</header>
 
-  <main>
+<main>
     <div class="container">
-      <div id="loginSection" class="admin-box">
-        <h2>Admin Login</h2>
 
-        <label for="adminPassword">Password</label>
-        <input type="password" id="adminPassword" placeholder="Enter Password">
+        <!-- LOGIN -->
+        <div id="loginSection" class="admin-box">
+            <h2>Admin Login</h2>
+            <label>Password</label>
+            <input type="password" id="adminPassword">
+            <button id="loginBtn">Login</button>
+            <p id="loginMessage"></p>
+        </div>
 
-        <button id="loginBtn">Login</button>
-        <p id="loginMessage"></p>
-      </div>
+        <!-- ADMIN MENU -->
+        <div id="adminMenu" class="admin-box" style="display:none;">
+            <h2>Admin Panel</h2>
+            <p class="muted">Choose an admin area:</p>
+            <button class="wide-btn" id="goMoviesBtn">1) Create Movies</button>
+            <button class="wide-btn" id="goScheduleBtn">2) Theaters + Scheduling</button>
+            <button class="wide-btn" id="goReportsBtn">3) Reports</button>
+            <button class="wide-btn secondary" id="logoutBtn">Logout</button>
+        </div>
 
-      <div id="adminPanel" class="admin-box" style="display:none;">
-        <h2>Schedule Showtimes</h2>
+        <!-- MOVIE CATALOG -->
+        <div id="movieAdmin" class="admin-box" style="display:none;">
+            <h2>Create Movies (Catalog)</h2>
 
-        <label for="movieTitle">Movie Title</label>
-        <input type="text" id="movieTitle" placeholder="Movie Title">
+            <label>Movie Title</label>
+            <input type="text" id="catalogTitle">
 
-        <label for="movieTime">Showtime</label>
-        <input type="text" id="movieTime" placeholder="Showtime (7:00 PM)">
+            <label>Description</label>
+            <input type="text" id="catalogDescription">
 
-        <button id="addMovieBtn">Add Movie</button>
+            <label>Genre</label>
+            <input type="text" id="catalogGenre">
 
-        <p id="adminMessage"></p>
+            <label>Runtime (minutes)</label>
+            <input type="number" id="catalogRuntime" min="1">
 
-        <h3>Current Schedule</h3>
-        <ul id="movieList"></ul>
-      </div>
+            <button id="saveCatalogMovieBtn">Save Movie</button>
+            <p id="catalogMessage"></p>
+
+            <h3>Movie Catalog</h3>
+            <ul id="catalogList"></ul>
+
+            <button class="wide-btn secondary" id="backFromMoviesBtn">← Back</button>
+        </div>
+
+        <!-- THEATERS + SCHEDULING -->
+        <div id="scheduleAdmin" class="admin-box" style="display:none;">
+            <h2>Theaters & Scheduling</h2>
+
+            <h3>Add Theater</h3>
+            <label>Theater Name</label>
+            <input type="text" id="newTheaterName" placeholder="e.g., North Theater">
+            <button id="addTheaterBtn">Add Theater</button>
+            <p id="theaterMessage"></p>
+
+            <h3>Add Auditorium</h3>
+            <label>Select Theater</label>
+            <select id="audTheaterSelect"></select>
+
+            <label>Auditorium Name</label>
+            <input type="text" id="newAuditoriumName" placeholder="e.g., Auditorium 1">
+            <button id="addAuditoriumBtn">Add Auditorium</button>
+            <p id="auditoriumMessage"></p>
+
+            <hr>
+
+            <h3>Schedule a Showtime</h3>
+
+            <label>Theater</label>
+            <select id="schedTheaterSelect"></select>
+
+            <label>Auditorium</label>
+            <select id="schedAuditoriumSelect"></select>
+
+            <label>Movie</label>
+            <select id="schedMovieSelect"></select>
+
+            <label>Date</label>
+            <input type="date" id="schedDate">
+
+            <label>Showtime</label>
+            <input type="text" id="schedTime" placeholder="e.g., 7:30 PM">
+
+            <label>Capacity (number of seats)</label>
+            <input type="number" id="schedCapacity" min="1">
+
+            <button id="scheduleShowtimeBtn">Add Showtime</button>
+            <p id="schedMessage"></p>
+
+            <h3>Current Showtimes</h3>
+            <ul id="showtimeList"></ul>
+
+            <hr>
+
+            <h3>Box Office Sales</h3>
+            <label>Select Showtime</label>
+            <select id="boxOfficeShowtime"></select>
+
+            <label>Ticket Quantity</label>
+            <input type="number" id="boxOfficeQuantity" min="1" value="1">
+
+            <button id="boxOfficeSellBtn">Sell Tickets</button>
+            <p id="boxOfficeMessage"></p>
+
+            <button class="wide-btn secondary" id="backFromScheduleBtn">← Back</button>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="reportAdmin" class="admin-box" style="display:none;">
+            <h2>Reports</h2>
+
+            <label>Theater</label>
+            <select id="reportTheater"></select>
+
+            <label>From (Show Date)</label>
+            <input type="date" id="reportStart">
+
+            <label>To (Show Date)</label>
+            <input type="date" id="reportEnd">
+
+            <button id="generateReportBtn">Generate Report</button>
+
+            <div id="reportOutput" class="report-output"></div>
+
+            <button class="wide-btn secondary" id="backFromReportsBtn">← Back</button>
+        </div>
+
     </div>
-  </main>
+</main>
 
-  <footer>
-    <p>&copy; 2026 TwoKies Cinema</p>
-  </footer>
+<footer>
+    <p>© 2026 TwoKies Cinema</p>
+</footer>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
