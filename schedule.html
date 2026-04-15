@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Schedule - TwoKies</title>
+    <title>Schedule</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,25 +20,23 @@
     <div class="container">
         <h2>Movie Schedule</h2>
 
-        <div class="filters">
-            <label>Select Theater (required)</label>
-            <select id="viewerTheater">
-                <option value="">-- Choose Theater --</option>
-            </select>
+        <label>Select Theater</label>
+        <select id="viewerTheater"></select>
 
-            <label>Optional: Filter by Date</label>
-            <input type="date" id="viewerDate">
+        <label>Optional Date</label>
+        <input type="date" id="viewerDate">
 
-            <button id="viewerFilterBtn">Show Schedule</button>
-        </div>
+        <button onclick="loadTheaterSchedule()">Show Schedule</button>
 
         <ul id="scheduleList"></ul>
+
+        <h3>Concessions</h3>
+        <ul id="concessionShop"></ul>
 
         <h3>Your Cart</h3>
         <ul id="cartList"></ul>
 
-        <button id="checkoutBtn">Purchase</button>
-
+        <button onclick="checkout()">Checkout</button>
         <div id="purchaseConfirmation"></div>
     </div>
 </main>
