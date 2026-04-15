@@ -1,39 +1,51 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Schedule - TwoKies</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="loadMovies()">
-
+<body>
 <header>
-<nav>
-    <div class="brand">TwoKies</div>
-    <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="schedule.html">View Schedule</a>
-        <a href="admin.html">Admin</a>
-    </div>
-</nav>
+    <nav>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">View Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
+    </nav>
 </header>
 
 <main>
-<div class="container">
+    <div class="container">
+        <h2>Movie Schedule</h2>
 
-<h2>Select Theater</h2>
-<select id="theaterFilter" onchange="filterByTheater()"></select>
+        <div class="filters">
+            <label>Select Theater (required)</label>
+            <select id="viewerTheater">
+                <option value="">-- Choose Theater --</option>
+            </select>
 
-<ul id="scheduleList"></ul>
+            <label>Optional: Filter by Date</label>
+            <input type="date" id="viewerDate">
 
-<h3>Your Cart</h3>
-<ul id="cartList"></ul>
-<button onclick="checkout()">Purchase</button>
+            <button id="viewerFilterBtn">Show Schedule</button>
+        </div>
 
-</div>
+        <ul id="scheduleList"></ul>
+
+        <h3>Your Cart</h3>
+        <ul id="cartList"></ul>
+
+        <button id="checkoutBtn">Purchase</button>
+
+        <div id="purchaseConfirmation"></div>
+    </div>
 </main>
 
 <footer>
-<p>© 2026 TwoKies Cinema</p>
+    <p>© 2026 TwoKies Cinema</p>
 </footer>
 
 <script src="script.js"></script>
