@@ -21,41 +21,36 @@
         </div>
 
         <div id="adminMenu" class="admin-box" style="display:none;">
-            <h2>Menu</h2>
-            <button class="wide-btn" id="goMoviesBtn">Manage Movies</button>
-            <button class="wide-btn" id="goScheduleBtn">Theaters & Scheduling</button>
-            <button class="wide-btn" id="goConcessionsBtn">Concessions & Inventory</button>
-            <button class="wide-btn" id="goReportsBtn">Reports</button>
+            <h2>Admin Panel</h2>
+            <button class="wide-btn" id="goMoviesBtn">1) Create Movies</button>
+            <button class="wide-btn" id="goScheduleBtn">2) Theaters & Scheduling</button>
+            <button class="wide-btn" id="goConcessionsBtn">3) Concessions & Inventory</button>
+            <button class="wide-btn" id="goReportsBtn">4) Reports</button>
             <button class="wide-btn secondary" id="logoutBtn">Logout</button>
         </div>
 
         <div id="movieAdmin" class="admin-box" style="display:none;">
-            <h2>Catalog</h2>
-            <input type="text" id="catalogTitle" placeholder="Movie Title">
-            <input type="text" id="catalogDescription" placeholder="Description">
+            <h2>Manage Movies</h2>
+            <input type="text" id="catalogTitle" placeholder="Title">
             <input type="text" id="catalogGenre" placeholder="Genre">
-            <input type="number" id="catalogRuntime" placeholder="Runtime">
+            <input type="number" id="catalogRuntime" placeholder="Runtime (min)">
             <button id="saveCatalogMovieBtn" class="wide-btn">Save Movie</button>
             <ul id="catalogList"></ul>
+            <button class="wide-btn secondary" id="backFromMoviesBtn">Back</button>
         </div>
 
         <div id="concessionAdmin" class="admin-box" style="display:none;">
-            <h2>Concessions</h2>
+            <h2>Inventory Management</h2>
             <input type="text" id="conName" placeholder="Item Name">
             <input type="number" id="conPrice" step="0.01" placeholder="Price">
             <input type="number" id="conStock" placeholder="Initial Stock">
-            <button id="saveConcessionBtn" class="wide-btn">Save Item</button>
+            <button id="saveConcessionBtn" class="wide-btn">Add to Inventory</button>
             <ul id="adminConcessionList"></ul>
+            <button class="wide-btn secondary" id="backFromConBtn">Back</button>
         </div>
-
-        <div id="scheduleAdmin" class="admin-box" style="display:none;">
-            <h2>Theaters</h2>
-            <input type="text" id="newTheaterName" placeholder="Theater Name">
-            <button id="addTheaterBtn">Add Theater</button>
-            <select id="audTheaterSelect"></select>
-        </div>
-
-        <div id="reportAdmin" class="admin-box" style="display:none;"><h2>Reports</h2><div id="reportOutput"></div></div>
+        
+        <div id="scheduleAdmin" style="display:none;"></div>
+        <div id="reportAdmin" style="display:none;"></div>
     </div>
 </main>
 <script src="script.js"></script>
