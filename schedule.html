@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,19 +25,24 @@
             <select id="viewerTheater">
                 <option value="">-- Choose Theater --</option>
             </select>
-
             <label>Optional: Filter by Date</label>
             <input type="date" id="viewerDate">
-
             <button id="viewerFilterBtn">Show Schedule</button>
         </div>
 
         <ul id="scheduleList"></ul>
 
+        <hr>
+        <h2>Concessions</h2>
+        <p>Add some snacks to your movie experience!</p>
+        <ul id="concessionDisplayList" class="concession-grid"></ul>
+
+        <hr>
         <h3>Your Cart</h3>
         <ul id="cartList"></ul>
+        <div id="cartTotal" style="font-weight:bold; margin: 10px 0; font-size: 1.2em;">Total: $0.00</div>
 
-        <button id="checkoutBtn">Purchase</button>
+        <button id="checkoutBtn" class="primary-btn" style="width: 200px;">Purchase Everything</button>
 
         <div id="purchaseConfirmation"></div>
     </div>
