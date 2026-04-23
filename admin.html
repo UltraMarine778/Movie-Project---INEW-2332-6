@@ -8,153 +8,56 @@
 <header>
     <nav>
         <div class="brand">TwoKies</div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="schedule.html">View Schedule</a>
-            <a href="admin.html">Admin</a>
-        </div>
+        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div>
     </nav>
 </header>
-
 <main>
     <div class="container">
-
         <div id="loginSection" class="admin-box">
             <h2>Admin Login</h2>
-            <label>Password</label>
-            <input type="password" id="adminPassword">
-            <button id="loginBtn">Login</button>
+            <input type="password" id="adminPassword" placeholder="Password">
+            <button id="loginBtn" class="wide-btn">Login</button>
             <p id="loginMessage"></p>
         </div>
 
         <div id="adminMenu" class="admin-box" style="display:none;">
-            <h2>Admin Panel</h2>
-            <p class="muted">Choose an admin area:</p>
-            <button class="wide-btn" id="goMoviesBtn">1) Create Movies</button>
-            <button class="wide-btn" id="goScheduleBtn">2) Theaters + Scheduling</button>
-            <button class="wide-btn" id="goConcessionsBtn">3) Concessions & Inventory</button>
-            <button class="wide-btn" id="goReportsBtn">4) Reports</button>
+            <h2>Menu</h2>
+            <button class="wide-btn" id="goMoviesBtn">Manage Movies</button>
+            <button class="wide-btn" id="goScheduleBtn">Theaters & Scheduling</button>
+            <button class="wide-btn" id="goConcessionsBtn">Concessions & Inventory</button>
+            <button class="wide-btn" id="goReportsBtn">Reports</button>
             <button class="wide-btn secondary" id="logoutBtn">Logout</button>
         </div>
 
         <div id="movieAdmin" class="admin-box" style="display:none;">
-            <h2>Create Movies (Catalog)</h2>
-            <label>Movie Title</label>
-            <input type="text" id="catalogTitle">
-            <label>Description</label>
-            <input type="text" id="catalogDescription">
-            <label>Genre</label>
-            <input type="text" id="catalogGenre">
-            <label>Runtime (minutes)</label>
-            <input type="number" id="catalogRuntime" min="1">
-            <button id="saveCatalogMovieBtn">Save Movie</button>
-            <p id="catalogMessage"></p>
-            <h3>Movie Catalog</h3>
+            <h2>Catalog</h2>
+            <input type="text" id="catalogTitle" placeholder="Movie Title">
+            <input type="text" id="catalogDescription" placeholder="Description">
+            <input type="text" id="catalogGenre" placeholder="Genre">
+            <input type="number" id="catalogRuntime" placeholder="Runtime">
+            <button id="saveCatalogMovieBtn" class="wide-btn">Save Movie</button>
             <ul id="catalogList"></ul>
-            <button class="wide-btn secondary" id="backFromMoviesBtn">← Back</button>
-        </div>
-
-        <div id="scheduleAdmin" class="admin-box" style="display:none;">
-            <h2>Theaters & Scheduling</h2>
-            <h3>Add Theater</h3>
-            <label>Theater Name</label>
-            <input type="text" id="newTheaterName" placeholder="e.g., North Theater">
-            <button id="addTheaterBtn">Add Theater</button>
-            <p id="theaterMessage"></p>
-
-            <h3>Add Auditorium</h3>
-            <label>Select Theater</label>
-            <select id="audTheaterSelect"></select>
-            <label>Auditorium Name</label>
-            <input type="text" id="newAuditoriumName" placeholder="e.g., Auditorium 1">
-            <button id="addAuditoriumBtn">Add Auditorium</button>
-            <p id="auditoriumMessage"></p>
-
-            <hr>
-            <h3>Schedule a Showtime</h3>
-            <label>Theater</label>
-            <select id="schedTheaterSelect"></select>
-            <label>Auditorium</label>
-            <select id="schedAuditoriumSelect"></select>
-            <label>Movie</label>
-            <select id="schedMovieSelect"></select>
-            <label>Date</label>
-            <input type="date" id="schedDate">
-            <label>Showtime</label>
-            <input type="text" id="schedTime" placeholder="e.g., 7:30 PM">
-            <label>Capacity</label>
-            <input type="number" id="schedCapacity" min="1">
-            <button id="scheduleShowtimeBtn">Add Showtime</button>
-            <p id="schedMessage"></p>
-
-            <h3>Current Showtimes</h3>
-            <ul id="showtimeList"></ul>
-
-            <hr>
-            <h3>Box Office Ticket Sales</h3>
-            <label>Select Showtime</label>
-            <select id="boxOfficeShowtime"></select>
-            <label>Ticket Quantity</label>
-            <input type="number" id="boxOfficeQuantity" min="1" value="1">
-            <button id="boxOfficeSellBtn">Sell Tickets</button>
-            <p id="boxOfficeMessage"></p>
-
-            <button class="wide-btn secondary" id="backFromScheduleBtn">← Back</button>
         </div>
 
         <div id="concessionAdmin" class="admin-box" style="display:none;">
-            <h2>Concessions & Inventory</h2>
-            <h3>Add New Item</h3>
-            <label>Item Name</label>
-            <input type="text" id="conName">
-            <label>Category</label>
-            <select id="conCategory">
-                <option value="Snack">Snack</option>
-                <option value="Drink">Drink</option>
-                <option value="Candy">Candy</option>
-            </select>
-            <label>Price ($)</label>
-            <input type="number" id="conPrice" step="0.01">
-            <label>Stock</label>
-            <input type="number" id="conStock">
-            <button id="saveConcessionBtn">Create Item</button>
-
-            <hr>
-            <h3>Inventory Management</h3>
+            <h2>Concessions</h2>
+            <input type="text" id="conName" placeholder="Item Name">
+            <input type="number" id="conPrice" step="0.01" placeholder="Price">
+            <input type="number" id="conStock" placeholder="Initial Stock">
+            <button id="saveConcessionBtn" class="wide-btn">Save Item</button>
             <ul id="adminConcessionList"></ul>
-
-            <hr>
-            <h3>Record Restock</h3>
-            <label>Item</label>
-            <select id="restockItemSelect"></select>
-            <label>Quantity Change</label>
-            <input type="number" id="restockQty" placeholder="+50 or -10">
-            <label>Reason</label>
-            <input type="text" id="restockReason" placeholder="e.g., Monthly restock">
-            <button id="restockBtn">Apply Adjustment</button>
-
-            <button class="wide-btn secondary" id="backFromConBtn">← Back</button>
         </div>
 
-        <div id="reportAdmin" class="admin-box" style="display:none;">
-            <h2>Reports</h2>
-            <label>Theater</label>
-            <select id="reportTheater"></select>
-            <label>From</label>
-            <input type="date" id="reportStart">
-            <label>To</label>
-            <input type="date" id="reportEnd">
-            <button id="generateReportBtn">Generate Report</button>
-            <div id="reportOutput" class="report-output"></div>
-            <button class="wide-btn secondary" id="backFromReportsBtn">← Back</button>
+        <div id="scheduleAdmin" class="admin-box" style="display:none;">
+            <h2>Theaters</h2>
+            <input type="text" id="newTheaterName" placeholder="Theater Name">
+            <button id="addTheaterBtn">Add Theater</button>
+            <select id="audTheaterSelect"></select>
         </div>
 
+        <div id="reportAdmin" class="admin-box" style="display:none;"><h2>Reports</h2><div id="reportOutput"></div></div>
     </div>
 </main>
-
-<footer>
-    <p>© 2026 TwoKies Cinema</p>
-</footer>
 <script src="script.js"></script>
 </body>
 </html>
