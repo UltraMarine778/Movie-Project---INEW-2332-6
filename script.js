@@ -1,7 +1,8 @@
+// SIMPLE ADMIN PASSWORD (demo only)
 const ADMIN_PASSWORD = "TwoKies123";
 
 /* -----------------------------
-   STORAGE HELPERS
+   STORAGE HELPERS (Ensures data stays after closing)
 --------------------------------*/
 const getTheaters = () => JSON.parse(localStorage.getItem("theaters")) || [];
 const saveTheaters = (t) => localStorage.setItem("theaters", JSON.stringify(t));
@@ -24,278 +25,165 @@ const saveConcessions = (c) => localStorage.setItem("concessions", JSON.stringif
 const getConcessionSales = () => JSON.parse(localStorage.getItem("concessionSales")) || [];
 const saveConcessionSales = (s) => localStorage.setItem("concessionSales", JSON.stringify(s));
 
-const getInventoryLogs = () => JSON.parse(localStorage.getItem("inventoryLogs")) || [];
-const saveInventoryLogs = (l) => localStorage.setItem("inventoryLogs", JSON.stringify(l));
-
 /* -----------------------------
    UTILS
 --------------------------------*/
 function byId(id) { return document.getElementById(id); }
 function generateConfirmationCode() { return "TK-" + Date.now().toString(36).toUpperCase(); }
-function parseISODate(d) { if(!d) return null; const [y,m,day] = d.split("-").map(Number); return new Date(y, m-1, day); }
 
 /* -----------------------------
-   INITIALIZATION
+   INIT
 --------------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
+    // Determine which page we are on
     if (byId("loginBtn")) initAdminPage();
     if (byId("viewerTheater")) initSchedulePage();
 });
 
 /* -----------------------------
-   ADMIN LOGIC
+   ADMIN PAGE LOGIC
 --------------------------------*/
 function initAdminPage() {
-    byId("loginBtn").addEventListener("click", () => {
+    // Login logic
+    byId("loginBtn").onclick = () => {
         if (byId("adminPassword").value === ADMIN_PASSWORD) {
             byId("loginSection").style.display = "none";
             byId("adminMenu").style.display = "block";
             refreshAdminUI();
         } else {
-            byId("loginMessage").textContent = "Invalid Password";
+            byId("loginMessage").textContent = "Incorrect Password";
         }
-    });
+    };
 
-    // Navigation
+    // Section Navigation
     byId("goMoviesBtn").onclick = () => showAdminSection("movieAdmin");
     byId("goScheduleBtn").onclick = () => showAdminSection("scheduleAdmin");
     byId("goConcessionsBtn").onclick = () => showAdminSection("concessionAdmin");
     byId("goReportsBtn").onclick = () => showAdminSection("reportAdmin");
     byId("logoutBtn").onclick = () => location.reload();
 
-    // Back Buttons
-    const backBtns = ["backFromMoviesBtn", "backFromScheduleBtn", "backFromConBtn", "backFromReportsBtn"];
-    backBtns.forEach(id => { if(byId(id)) byId(id).onclick = () => showAdminSection("adminMenu"); });
+    // Save Movie to Catalog
+    byId("saveCatalogMovieBtn").onclick = () => {
+        const title = byId("catalogTitle").value;
+        const desc = byId("catalogDescription").value;
+        const genre = byId("catalogGenre").value;
+        const run = byId("catalogRuntime").value;
 
-    // Actions
-    byId("saveCatalogMovieBtn").onclick = addMovieToCatalog;
-    byId("addTheaterBtn").onclick = addTheater;
-    byId("addAuditoriumBtn").onclick = addAuditorium;
-    byId("scheduleShowtimeBtn").onclick = scheduleShowtime;
-    byId("saveConcessionBtn").onclick = addConcessionItem;
-    byId("restockBtn").onclick = processRestock;
-    byId("generateReportBtn").onclick = generateReport;
-    byId("boxOfficeSellBtn").onclick = processBoxOfficeSale;
+        if (!title || !run) return alert("Please fill title and runtime.");
+
+        const catalog = getMovieCatalog();
+        catalog.push({ id: Date.now(), title, desc, genre, runtime: run });
+        saveMovieCatalog(catalog); // PERMANENT SAVE
+        
+        // Clear fields
+        ["catalogTitle", "catalogDescription", "catalogGenre", "catalogRuntime"].forEach(id => byId(id).value = "");
+        refreshAdminUI();
+    };
+
+    // Add Theater
+    byId("addTheaterBtn").onclick = () => {
+        const name = byId("newTheaterName").value;
+        if (!name) return;
+        const theaters = getTheaters();
+        theaters.push({ id: Date.now(), name, auditoriums: ["Auditorium 1"] });
+        saveTheaters(theaters);
+        byId("newTheaterName").value = "";
+        refreshAdminUI();
+    };
+
+    // Save Concession Item
+    byId("saveConcessionBtn").onclick = () => {
+        const name = byId("conName").value;
+        const price = parseFloat(byId("conPrice").value);
+        const stock = parseInt(byId("conStock").value);
+
+        if (!name || isNaN(price)) return alert("Invalid Concession Data");
+
+        const items = getConcessions();
+        items.push({ id: Date.now(), name, price, stock, active: true });
+        saveConcessions(items);
+        
+        byId("conName").value = "";
+        byId("conPrice").value = "";
+        byId("conStock").value = "";
+        refreshAdminUI();
+    };
 
     refreshAdminUI();
 }
 
 function showAdminSection(id) {
-    ["adminMenu", "movieAdmin", "scheduleAdmin", "concessionAdmin", "reportAdmin"].forEach(sec => {
-        byId(sec).style.display = (sec === id) ? "block" : "none";
-    });
-    refreshAdminUI();
+    const sections = ["adminMenu", "movieAdmin", "scheduleAdmin", "concessionAdmin", "reportAdmin"];
+    sections.forEach(s => byId(s).style.display = (s === id) ? "block" : "none");
 }
 
 function refreshAdminUI() {
-    renderCatalogList();
-    renderShowtimeList();
-    renderAdminConcessions();
+    renderCatalog();
+    renderConcessions();
     populateSelects();
 }
 
-function populateSelects() {
-    const theaters = getTheaters();
-    const catalog = getMovieCatalog();
-    const showtimes = getShowtimes();
-    const concessions = getConcessions();
-
-    const fills = [
-        { el: "audTheaterSelect", data: theaters, text: "name", val: "id" },
-        { el: "schedTheaterSelect", data: theaters, text: "name", val: "id" },
-        { el: "schedMovieSelect", data: catalog, text: "title", val: "id" },
-        { el: "boxOfficeShowtime", data: showtimes, text: (s) => `${s.movieTitle} - ${s.time}`, val: "id" },
-        { el: "reportTheater", data: theaters, text: "name", val: "id" },
-        { el: "restockItemSelect", data: concessions, text: "name", val: "id" }
-    ];
-
-    fills.forEach(f => {
-        const select = byId(f.el);
-        if (!select) return;
-        select.innerHTML = "";
-        f.data.forEach(item => {
-            const opt = document.createElement("option");
-            opt.value = item[f.val] || item.id;
-            opt.textContent = typeof f.text === "function" ? f.text(item) : item[f.text];
-            select.appendChild(opt);
-        });
-    });
-}
-
-/* -----------------------------
-   CONCESSION & INVENTORY LOGIC
---------------------------------*/
-function addConcessionItem() {
-    const name = byId("conName").value;
-    const category = byId("conCategory").value;
-    const price = parseFloat(byId("conPrice").value);
-    const stock = parseInt(byId("conStock").value);
-
-    if (!name || isNaN(price)) return alert("Invalid inputs");
-
-    const items = getConcessions();
-    const newItem = { id: Date.now(), name, category, price, stock, active: true };
-    items.push(newItem);
-    saveConcessions(items);
-    logInventory(name, stock, "Initial Stock");
-    refreshAdminUI();
-}
-
-function renderAdminConcessions() {
-    const list = byId("adminConcessionList");
+function renderCatalog() {
+    const list = byId("catalogList");
     if (!list) return;
-    const items = getConcessions();
-    list.innerHTML = items.map(i => `
+    list.innerHTML = getMovieCatalog().map((m, idx) => `
         <li>
-            <div><strong>${i.name}</strong> (${i.category}) - $${i.price.toFixed(2)}<br>Stock: ${i.stock}</div>
-            <button onclick="deleteConcession(${i.id})">Delete</button>
+            <div><strong>${m.title}</strong> (${m.runtime} min)</div>
+            <button onclick="deleteMovie(${idx})">Delete</button>
         </li>
     `).join("");
 }
 
-function processRestock() {
-    const id = parseInt(byId("restockItemSelect").value);
-    const qty = parseInt(byId("restockQty").value);
-    const reason = byId("restockReason").value || "Adjustment";
+function renderConcessions() {
+    const list = byId("adminConcessionList");
+    if (!list) return;
+    list.innerHTML = getConcessions().map(c => `
+        <li>
+            <div><strong>${c.name}</strong> - $${c.price.toFixed(2)} (Stock: ${c.stock})</div>
+        </li>
+    `).join("");
+}
 
-    const items = getConcessions();
-    const item = items.find(i => i.id === id);
-    if (item) {
-        item.stock += qty;
-        saveConcessions(items);
-        logInventory(item.name, qty, reason);
-        alert("Inventory Updated");
-        refreshAdminUI();
+function populateSelects() {
+    const theaters = getTheaters();
+    const tSelect = byId("audTheaterSelect");
+    if (tSelect) {
+        tSelect.innerHTML = theaters.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
     }
 }
 
-function logInventory(name, change, reason) {
-    const logs = getInventoryLogs();
-    logs.push({ date: new Date().toLocaleString(), name, change, reason });
-    saveInventoryLogs(logs);
-}
-
 /* -----------------------------
-   CUSTOMER / POS LOGIC
+   CUSTOMER PAGE LOGIC
 --------------------------------*/
 function initSchedulePage() {
     const tSelect = byId("viewerTheater");
-    getTheaters().forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t.id;
-        opt.textContent = t.name;
-        tSelect.appendChild(opt);
-    });
+    tSelect.innerHTML = '<option value="">-- Choose Theater --</option>' + 
+        getTheaters().map(t => `<option value="${t.id}">${t.name}</option>`).join("");
 
-    byId("viewerFilterBtn").onclick = loadTheaterSchedule;
-    byId("checkoutBtn").onclick = handleCheckout;
     renderCustomerConcessions();
-    updateCartDisplay();
 }
 
 function renderCustomerConcessions() {
     const area = byId("concessionDisplayArea");
     if (!area) return;
-    const items = getConcessions().filter(i => i.active);
-    area.innerHTML = items.map(i => `
-        <div class="concession-card">
-            <strong>${i.name}</strong><br>$${i.price.toFixed(2)}<br>
-            <small>Stock: ${i.stock}</small><br>
-            <button onclick="addToCart(${i.id}, 'concession')">Add to Cart</button>
+    area.innerHTML = getConcessions().map(c => `
+        <div class="card">
+            <strong>${c.name}</strong><br>$${c.price.toFixed(2)}<br>
+            <button onclick="addToCart(${c.id})">Add to Order</button>
         </div>
     `).join("");
 }
 
-function addToCart(id, type) {
+function addToCart(id) {
     const cart = getCart();
-    if (type === 'concession') {
-        const item = getConcessions().find(c => c.id === id);
-        const existing = cart.find(c => c.itemId === id && c.type === 'concession');
-        if (existing) existing.qty++;
-        else cart.push({ itemId: id, name: item.name, price: item.price, qty: 1, type: 'concession' });
-    } else {
-        // Existing ticket logic
-        cart.push({ itemId: id, name: "Movie Ticket", price: 12.00, qty: 1, type: 'ticket' });
-    }
+    const item = getConcessions().find(c => c.id === id);
+    cart.push({ id: Date.now(), name: item.name, price: item.price });
     saveCart(cart);
     updateCartDisplay();
 }
 
 function updateCartDisplay() {
     const list = byId("cartList");
-    if (!list) return;
     const cart = getCart();
-    let total = 0;
-    list.innerHTML = cart.map((item, index) => {
-        total += item.price * item.qty;
-        return `<li>${item.name} x ${item.qty} - $${(item.price * item.qty).toFixed(2)} 
-        <button onclick="removeFromCart(${index})">X</button></li>`;
-    }).join("");
-    byId("cartTotal").textContent = `Total: $${total.toFixed(2)}`;
+    list.innerHTML = cart.map(i => `<li>${i.name} - $${i.price.toFixed(2)}</li>`).join("");
 }
-
-function handleCheckout() {
-    const cart = getCart();
-    const concessions = getConcessions();
-    const sales = getConcessionSales();
-    const tickets = getTickets();
-    const code = generateConfirmationCode();
-
-    // 1. Validate Stock (SYSTEM BLOCK)
-    for (const item of cart) {
-        if (item.type === 'concession') {
-            const master = concessions.find(c => c.id === item.itemId);
-            if (master.stock < item.qty) {
-                return alert(`Sorry, not enough stock for ${master.name}`);
-            }
-        }
-    }
-
-    // 2. Process
-    cart.forEach(item => {
-        if (item.type === 'concession') {
-            const master = concessions.find(c => c.id === item.itemId);
-            master.stock -= item.qty; // DECREMENT
-            sales.push({ code, name: item.name, qty: item.qty, price: item.price, date: new Date().toISOString() });
-            logInventory(item.name, -item.qty, `Sale ${code}`);
-        } else {
-            tickets.push({ code, showtimeId: item.itemId, qty: item.qty, timestamp: new Date().toISOString() });
-        }
-    });
-
-    saveConcessions(concessions);
-    saveConcessionSales(sales);
-    saveTickets(tickets);
-    saveCart([]);
-    alert(`Success! Confirmation: ${code}`);
-    location.reload();
-}
-
-function removeFromCart(index) {
-    const cart = getCart();
-    cart.splice(index, 1);
-    saveCart(cart);
-    updateCartDisplay();
-}
-
-/* -----------------------------
-   REPORTING
---------------------------------*/
-function generateReport() {
-    const conSales = getConcessionSales();
-    const tickets = getTickets();
-    const out = byId("reportOutput");
-    
-    let conTotal = conSales.reduce((sum, s) => sum + (s.price * s.qty), 0);
-    let ticketTotal = tickets.length;
-
-    out.innerHTML = `
-        <div class="report-box">
-            <h3>Sales Summary</h3>
-            <p>Concession Revenue: $${conTotal.toFixed(2)}</p>
-            <p>Tickets Sold: ${ticketTotal}</p>
-        </div>
-    `;
-}
-
-// ... include existing addMovieToCatalog, addTheater, addAuditorium, scheduleShowtime from your original script ...
