@@ -6,21 +6,21 @@
 </head>
 <body>
 <header>
-    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div></nav>
+    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a></div></nav>
 </header>
 <main>
     <div class="container">
         <h2>Select Theater</h2>
         <select id="viewerTheater"></select>
-        
-        <hr>
-        <h2>Concessions</h2>
-        <div id="concessionDisplayArea" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
 
         <hr>
-        <h3>Your Cart</h3>
+        <h2>Concessions</h2>
+        <div id="concessionArea" style="display:flex; gap:10px; justify-content:center;"></div>
+
+        <hr>
+        <h3>Your Order</h3>
         <ul id="cartList"></ul>
-        <button id="checkoutBtn" class="primary-btn">Purchase Everything</button>
+        <button id="checkoutBtn" class="primary-btn">Complete Purchase</button>
     </div>
 </main>
 <script src="script.js"></script>
