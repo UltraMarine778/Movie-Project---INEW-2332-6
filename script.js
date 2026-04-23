@@ -1,8 +1,8 @@
-// SIMPLE ADMIN PASSWORD (demo only)
+// SIMPLE ADMIN PASSWORD
 const ADMIN_PASSWORD = "TwoKies123";
 
 /* -----------------------------
-   STORAGE HELPERS (Ensures data stays after closing)
+   STORAGE HELPERS (Persistence)
 --------------------------------*/
 const getTheaters = () => JSON.parse(localStorage.getItem("theaters")) || [];
 const saveTheaters = (t) => localStorage.setItem("theaters", JSON.stringify(t));
@@ -22,9 +22,6 @@ const saveTickets = (t) => localStorage.setItem("tickets", JSON.stringify(t));
 const getConcessions = () => JSON.parse(localStorage.getItem("concessions")) || [];
 const saveConcessions = (c) => localStorage.setItem("concessions", JSON.stringify(c));
 
-const getConcessionSales = () => JSON.parse(localStorage.getItem("concessionSales")) || [];
-const saveConcessionSales = (s) => localStorage.setItem("concessionSales", JSON.stringify(s));
-
 /* -----------------------------
    UTILS
 --------------------------------*/
@@ -35,16 +32,15 @@ function generateConfirmationCode() { return "TK-" + Date.now().toString(36).toU
    INIT
 --------------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
-    // Determine which page we are on
     if (byId("loginBtn")) initAdminPage();
     if (byId("viewerTheater")) initSchedulePage();
 });
 
 /* -----------------------------
-   ADMIN PAGE LOGIC
+   ADMIN LOGIC
 --------------------------------*/
 function initAdminPage() {
-    // Login logic
+    // Login
     byId("loginBtn").onclick = () => {
         if (byId("adminPassword").value === ADMIN_PASSWORD) {
             byId("loginSection").style.display = "none";
@@ -55,57 +51,41 @@ function initAdminPage() {
         }
     };
 
-    // Section Navigation
+    // Navigation
     byId("goMoviesBtn").onclick = () => showAdminSection("movieAdmin");
     byId("goScheduleBtn").onclick = () => showAdminSection("scheduleAdmin");
     byId("goConcessionsBtn").onclick = () => showAdminSection("concessionAdmin");
     byId("goReportsBtn").onclick = () => showAdminSection("reportAdmin");
     byId("logoutBtn").onclick = () => location.reload();
 
-    // Save Movie to Catalog
+    // Back Buttons
+    ["backFromMoviesBtn", "backFromScheduleBtn", "backFromConBtn", "backFromReportsBtn"].forEach(id => {
+        if (byId(id)) byId(id).onclick = () => showAdminSection("adminMenu");
+    });
+
+    // Save Movie
     byId("saveCatalogMovieBtn").onclick = () => {
         const title = byId("catalogTitle").value;
-        const desc = byId("catalogDescription").value;
-        const genre = byId("catalogGenre").value;
-        const run = byId("catalogRuntime").value;
-
-        if (!title || !run) return alert("Please fill title and runtime.");
-
-        const catalog = getMovieCatalog();
-        catalog.push({ id: Date.now(), title, desc, genre, runtime: run });
-        saveMovieCatalog(catalog); // PERMANENT SAVE
+        const runtime = byId("catalogRuntime").value;
+        if (!title || !runtime) return alert("Fill required fields");
         
-        // Clear fields
-        ["catalogTitle", "catalogDescription", "catalogGenre", "catalogRuntime"].forEach(id => byId(id).value = "");
+        const catalog = getMovieCatalog();
+        catalog.push({ id: Date.now(), title, genre: byId("catalogGenre").value, runtime });
+        saveMovieCatalog(catalog);
         refreshAdminUI();
     };
 
-    // Add Theater
-    byId("addTheaterBtn").onclick = () => {
-        const name = byId("newTheaterName").value;
-        if (!name) return;
-        const theaters = getTheaters();
-        theaters.push({ id: Date.now(), name, auditoriums: ["Auditorium 1"] });
-        saveTheaters(theaters);
-        byId("newTheaterName").value = "";
-        refreshAdminUI();
-    };
-
-    // Save Concession Item
+    // Save Concession
     byId("saveConcessionBtn").onclick = () => {
         const name = byId("conName").value;
         const price = parseFloat(byId("conPrice").value);
         const stock = parseInt(byId("conStock").value);
 
-        if (!name || isNaN(price)) return alert("Invalid Concession Data");
+        if (!name || isNaN(price) || isNaN(stock)) return alert("Invalid entry");
 
         const items = getConcessions();
-        items.push({ id: Date.now(), name, price, stock, active: true });
+        items.push({ id: Date.now(), name, price, stock });
         saveConcessions(items);
-        
-        byId("conName").value = "";
-        byId("conPrice").value = "";
-        byId("conStock").value = "";
         refreshAdminUI();
     };
 
@@ -113,47 +93,27 @@ function initAdminPage() {
 }
 
 function showAdminSection(id) {
-    const sections = ["adminMenu", "movieAdmin", "scheduleAdmin", "concessionAdmin", "reportAdmin"];
-    sections.forEach(s => byId(s).style.display = (s === id) ? "block" : "none");
+    ["adminMenu", "movieAdmin", "scheduleAdmin", "concessionAdmin", "reportAdmin"].forEach(sec => {
+        if (byId(sec)) byId(sec).style.display = (sec === id) ? "block" : "none";
+    });
 }
 
 function refreshAdminUI() {
-    renderCatalog();
-    renderConcessions();
-    populateSelects();
-}
-
-function renderCatalog() {
-    const list = byId("catalogList");
-    if (!list) return;
-    list.innerHTML = getMovieCatalog().map((m, idx) => `
-        <li>
-            <div><strong>${m.title}</strong> (${m.runtime} min)</div>
-            <button onclick="deleteMovie(${idx})">Delete</button>
-        </li>
-    `).join("");
-}
-
-function renderConcessions() {
-    const list = byId("adminConcessionList");
-    if (!list) return;
-    list.innerHTML = getConcessions().map(c => `
-        <li>
-            <div><strong>${c.name}</strong> - $${c.price.toFixed(2)} (Stock: ${c.stock})</div>
-        </li>
-    `).join("");
-}
-
-function populateSelects() {
-    const theaters = getTheaters();
-    const tSelect = byId("audTheaterSelect");
-    if (tSelect) {
-        tSelect.innerHTML = theaters.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+    // Render Catalog
+    const cList = byId("catalogList");
+    if (cList) {
+        cList.innerHTML = getMovieCatalog().map(m => `<li>${m.title} (${m.runtime}m)</li>`).join("");
+    }
+    
+    // Render Concessions
+    const conList = byId("adminConcessionList");
+    if (conList) {
+        conList.innerHTML = getConcessions().map(c => `<li>${c.name} - $${c.price.toFixed(2)} (Stock: ${c.stock})</li>`).join("");
     }
 }
 
 /* -----------------------------
-   CUSTOMER PAGE LOGIC
+   CUSTOMER LOGIC
 --------------------------------*/
 function initSchedulePage() {
     const tSelect = byId("viewerTheater");
@@ -161,10 +121,13 @@ function initSchedulePage() {
         getTheaters().map(t => `<option value="${t.id}">${t.name}</option>`).join("");
 
     renderCustomerConcessions();
+    updateCartDisplay();
+
+    byId("checkoutBtn").onclick = handleCheckout;
 }
 
 function renderCustomerConcessions() {
-    const area = byId("concessionDisplayArea");
+    const area = byId("concessionArea");
     if (!area) return;
     area.innerHTML = getConcessions().map(c => `
         <div class="card">
@@ -177,13 +140,37 @@ function renderCustomerConcessions() {
 function addToCart(id) {
     const cart = getCart();
     const item = getConcessions().find(c => c.id === id);
-    cart.push({ id: Date.now(), name: item.name, price: item.price });
+    const existing = cart.find(i => i.itemId === id);
+    
+    if (existing) existing.qty++;
+    else cart.push({ itemId: id, name: item.name, price: item.price, qty: 1 });
+    
     saveCart(cart);
     updateCartDisplay();
 }
 
 function updateCartDisplay() {
     const list = byId("cartList");
+    if (!list) return;
     const cart = getCart();
-    list.innerHTML = cart.map(i => `<li>${i.name} - $${i.price.toFixed(2)}</li>`).join("");
+    list.innerHTML = cart.map(i => `<li>${i.name} x ${i.qty} - $${(i.price * i.qty).toFixed(2)}</li>`).join("");
+}
+
+function handleCheckout() {
+    const cart = getCart();
+    const concessions = getConcessions();
+    
+    if (cart.length === 0) return alert("Cart is empty");
+
+    // Inventory Check & Decrement
+    for (let cartItem of cart) {
+        let masterItem = concessions.find(c => c.id === cartItem.itemId);
+        if (masterItem.stock < cartItem.qty) return alert(`Not enough stock for ${masterItem.name}`);
+        masterItem.stock -= cartItem.qty;
+    }
+
+    saveConcessions(concessions);
+    saveCart([]);
+    alert("Purchase successful! Inventory updated.");
+    location.reload();
 }
