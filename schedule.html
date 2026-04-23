@@ -6,48 +6,23 @@
 </head>
 <body>
 <header>
-    <nav>
-        <div class="brand">TwoKies</div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="schedule.html">View Schedule</a>
-            <a href="admin.html">Admin</a>
-        </div>
-    </nav>
+    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div></nav>
 </header>
-
 <main>
     <div class="container">
-        <h2>Movie Schedule</h2>
-        <div class="filters">
-            <label>Select Theater</label>
-            <select id="viewerTheater">
-                <option value="">-- Choose Theater --</option>
-            </select>
-            <label>Filter by Date</label>
-            <input type="date" id="viewerDate">
-            <button id="viewerFilterBtn">Show Schedule</button>
-        </div>
-
-        <ul id="scheduleList"></ul>
-
+        <h2>Select Theater</h2>
+        <select id="viewerTheater"></select>
+        
         <hr>
         <h2>Concessions</h2>
-        <div id="concessionDisplayArea" class="concession-grid"></div>
+        <div id="concessionDisplayArea" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
 
         <hr>
-        <h3>Your Order</h3>
+        <h3>Your Cart</h3>
         <ul id="cartList"></ul>
-        <div id="cartTotal" class="total-display">Total: $0.00</div>
-        <button id="checkoutBtn" class="primary-btn">Complete Purchase</button>
-
-        <div id="purchaseConfirmation"></div>
+        <button id="checkoutBtn" class="primary-btn">Purchase Everything</button>
     </div>
 </main>
-
-<footer>
-    <p>© 2026 TwoKies Cinema</p>
-</footer>
 <script src="script.js"></script>
 </body>
 </html>
