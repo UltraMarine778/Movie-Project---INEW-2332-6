@@ -1,200 +1,71 @@
-
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, sans-serif;
     background-color: #f4f6fb;
 }
 
-/* NAVIGATION BAR */
 nav {
     background-color: #0a1f44;
     padding: 15px 40px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-.brand {
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-}
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    margin-left: 30px;
-    font-weight: bold;
-}
-.nav-links a:hover {
-    text-decoration: underline;
 }
 
-/* CONTAINER */
-.container {
-    padding: 60px;
-    text-align: center;
-}
-.movie-details {
-    background: #f0f4ff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 8px;
-}
+.brand { color: white; font-weight: bold; }
+.nav-links a { color: white; margin-left: 20px; text-decoration: none; }
 
-/* HOME TITLE / HERO */
-.home-title {
-    font-size: 48px;
-    color: #0a1f44;
-    margin-bottom: 10px;
-}
-.hero {
-    margin-top: 80px;
-}
-.hero-text {
-    font-size: 18px;
-    color: #333;
-    max-width: 600px;
-    margin: 0 auto 20px auto;
-}
-.primary-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 24px;
-    background-color: #0a1f44;
-    color: white;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-}
-.primary-btn:hover {
-    background-color: #163a78;
-}
+.container { padding: 40px; text-align: center; }
 
-/* ADMIN PANEL */
 .admin-box {
     background: white;
-    width: 420px;
-    margin: 40px auto;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    text-align: left;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-label {
-    display: block;
-    text-align: left;
-    margin-top: 10px;
-    font-weight: bold;
-}
 input, select {
+    display: block;
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    margin: 10px 0;
+    padding: 8px;
 }
-button {
-    background-color: #0a1f44;
+
+.wide-btn, .primary-btn {
+    background: #0a1f44;
     color: white;
-    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    padding: 12px;
     cursor: pointer;
-}
-button:hover {
-    background-color: #163a78;
-}
-
-.wide-btn {
     width: 100%;
-    margin-top: 10px;
-}
-button.secondary {
-    background: #6b7280;
-}
-button.secondary:hover {
-    background: #4b5563;
+    border-radius: 4px;
 }
 
-.muted {
-    color: #666;
-    font-size: 14px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-li {
-    background: white;
-    margin: 10px auto;
-    padding: 15px;
-    width: 60%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border-radius: 6px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-}
-li > div:first-child {
-    text-align: left;
-    width: 100%;
-}
-
-/* FOOTER */
-footer {
-    text-align: center;
+.concession-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
     padding: 20px;
-    color: #555;
-    font-size: 14px;
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 600px) {
-    .container {
-        padding: 20px;
-    }
-    .admin-box {
-        width: 90%;
-        margin: 20px auto;
-        padding: 20px;
-    }
-    li {
-        width: 90%;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .nav-links a {
-        margin-left: 15px;
-        font-size: 14px;
-    }
-    .home-title {
-        font-size: 32px;
-    }
-}
-
-/* SOLD OUT + CONFIRMATION */
-.sold-out {
-    color: #c00000;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-#purchaseConfirmation {
-    margin-top: 20px;
-    background: #e6ffe6;
+.concession-card {
+    background: white;
     padding: 15px;
-    border-radius: 6px;
-    text-align: left;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
-#purchaseConfirmation h4 {
-    margin-top: 0;
+
+.total-display {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #0a1f44;
 }
 
 .report-output {
-    margin-top: 15px;
-    background: #f0f4ff;
-    padding: 12px;
-    border-radius: 6px;
+    margin-top: 20px;
+    text-align: left;
+    background: #eef2f7;
+    padding: 15px;
 }
