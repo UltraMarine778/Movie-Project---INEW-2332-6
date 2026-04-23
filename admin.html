@@ -104,10 +104,9 @@
 
         <div id="concessionAdmin" class="admin-box" style="display:none;">
             <h2>Concessions & Inventory</h2>
-            
-            <h3>Create Item</h3>
+            <h3>Add New Item</h3>
             <label>Item Name</label>
-            <input type="text" id="conName" placeholder="Popcorn">
+            <input type="text" id="conName">
             <label>Category</label>
             <select id="conCategory">
                 <option value="Snack">Snack</option>
@@ -115,24 +114,24 @@
                 <option value="Candy">Candy</option>
             </select>
             <label>Price ($)</label>
-            <input type="number" id="conPrice" step="0.01" min="0">
-            <label>Initial Stock</label>
-            <input type="number" id="conStock" min="0">
-            <button id="saveConcessionBtn">Save Item</button>
+            <input type="number" id="conPrice" step="0.01">
+            <label>Stock</label>
+            <input type="number" id="conStock">
+            <button id="saveConcessionBtn">Create Item</button>
 
             <hr>
             <h3>Inventory Management</h3>
             <ul id="adminConcessionList"></ul>
 
             <hr>
-            <h3>Restock Item</h3>
-            <label>Select Item</label>
+            <h3>Record Restock</h3>
+            <label>Item</label>
             <select id="restockItemSelect"></select>
-            <label>Quantity to Add</label>
-            <input type="number" id="restockQty" min="1">
+            <label>Quantity Change</label>
+            <input type="number" id="restockQty" placeholder="+50 or -10">
             <label>Reason</label>
-            <input type="text" id="restockReason" placeholder="Regular restock">
-            <button id="restockBtn">Process Restock</button>
+            <input type="text" id="restockReason" placeholder="e.g., Monthly restock">
+            <button id="restockBtn">Apply Adjustment</button>
 
             <button class="wide-btn secondary" id="backFromConBtn">← Back</button>
         </div>
@@ -146,7 +145,6 @@
             <label>To</label>
             <input type="date" id="reportEnd">
             <button id="generateReportBtn">Generate Report</button>
-
             <div id="reportOutput" class="report-output"></div>
             <button class="wide-btn secondary" id="backFromReportsBtn">← Back</button>
         </div>
@@ -157,7 +155,6 @@
 <footer>
     <p>© 2026 TwoKies Cinema</p>
 </footer>
-
 <script src="script.js"></script>
 </body>
 </html>
