@@ -8,7 +8,7 @@
 <header>
     <nav>
         <div class="brand">TwoKies</div>
-        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div>
+        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">POS/Schedule</a><a href="admin.html">Admin</a></div>
     </nav>
 </header>
 <main>
@@ -22,35 +22,32 @@
 
         <div id="adminMenu" class="admin-box" style="display:none;">
             <h2>Admin Panel</h2>
-            <button class="wide-btn" id="goMoviesBtn">1) Create Movies</button>
-            <button class="wide-btn" id="goScheduleBtn">2) Theaters & Scheduling</button>
-            <button class="wide-btn" id="goConcessionsBtn">3) Concessions & Inventory</button>
-            <button class="wide-btn" id="goReportsBtn">4) Reports</button>
+            <button class="wide-btn" id="goMoviesBtn">Manage Movies</button>
+            <button class="wide-btn" id="goConcessionsBtn">Concessions & Inventory</button>
+            <button class="wide-btn" id="goReportsBtn">Reports & Logs</button>
             <button class="wide-btn secondary" id="logoutBtn">Logout</button>
-        </div>
-
-        <div id="movieAdmin" class="admin-box" style="display:none;">
-            <h2>Manage Movies</h2>
-            <input type="text" id="catalogTitle" placeholder="Title">
-            <input type="text" id="catalogGenre" placeholder="Genre">
-            <input type="number" id="catalogRuntime" placeholder="Runtime (min)">
-            <button id="saveCatalogMovieBtn" class="wide-btn">Save Movie</button>
-            <ul id="catalogList"></ul>
-            <button class="wide-btn secondary" id="backFromMoviesBtn">Back</button>
         </div>
 
         <div id="concessionAdmin" class="admin-box" style="display:none;">
             <h2>Inventory Management</h2>
             <input type="text" id="conName" placeholder="Item Name">
+            <select id="conCategory">
+                <option value="Snacks">Snacks</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Meals">Meals</option>
+            </select>
             <input type="number" id="conPrice" step="0.01" placeholder="Price">
             <input type="number" id="conStock" placeholder="Initial Stock">
             <button id="saveConcessionBtn" class="wide-btn">Add to Inventory</button>
             <ul id="adminConcessionList"></ul>
-            <button class="wide-btn secondary" id="backFromConBtn">Back</button>
+            <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
-        
-        <div id="scheduleAdmin" style="display:none;"></div>
-        <div id="reportAdmin" style="display:none;"></div>
+
+        <div id="reportAdmin" class="admin-box" style="display:none;">
+            <h2>System Reports</h2>
+            <div id="reportOutput" class="report-output"></div>
+            <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
+        </div>
     </div>
 </main>
 <script src="script.js"></script>
