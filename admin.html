@@ -8,7 +8,7 @@
 <header>
     <nav>
         <div class="brand">TwoKies</div>
-        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">POS/Schedule</a><a href="admin.html">Admin</a></div>
+        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div>
     </nav>
 </header>
 <main>
@@ -22,7 +22,6 @@
 
         <div id="adminMenu" class="admin-box" style="display:none;">
             <h2>Admin Panel</h2>
-            <button class="wide-btn" id="goMoviesBtn">Manage Movies</button>
             <button class="wide-btn" id="goConcessionsBtn">Concessions & Inventory</button>
             <button class="wide-btn" id="goReportsBtn">Reports & Logs</button>
             <button class="wide-btn secondary" id="logoutBtn">Logout</button>
@@ -31,7 +30,7 @@
         <div id="concessionAdmin" class="admin-box" style="display:none;">
             <h2>Inventory Management</h2>
             <input type="text" id="conName" placeholder="Item Name">
-            <select id="conCategory">
+            <select id="conCategory" class="wide-btn" style="background:white; color:black; border: 1px solid #ccc;">
                 <option value="Snacks">Snacks</option>
                 <option value="Drinks">Drinks</option>
                 <option value="Meals">Meals</option>
@@ -39,13 +38,13 @@
             <input type="number" id="conPrice" step="0.01" placeholder="Price">
             <input type="number" id="conStock" placeholder="Initial Stock">
             <button id="saveConcessionBtn" class="wide-btn">Add to Inventory</button>
-            <ul id="adminConcessionList"></ul>
+            <ul id="adminConcessionList" style="text-align:left;"></ul>
             <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
 
         <div id="reportAdmin" class="admin-box" style="display:none;">
             <h2>System Reports</h2>
-            <div id="reportOutput" class="report-output"></div>
+            <div id="reportOutput" class="report-output" style="text-align:left;"></div>
             <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
     </div>
