@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>POS - TwoKies</title>
+    <title>Schedule - TwoKies</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">POS</a></div></nav>
+    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a></div></nav>
 </header>
 <main>
     <div class="container">
-        <h2>Concessions Menu</h2>
-        <div id="concessionArea" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
+        <h2>Concessions</h2>
+        <div id="concessionArea" class="concession-grid"></div>
 
         <hr>
-        <h3>Current Order</h3>
-        <ul id="cartList"></ul>
+        <h3>Your Order</h3>
+        <ul id="cartList" style="list-style:none; padding:0;"></ul>
         <div class="total-display">Total: $<span id="cartTotal">0.00</span></div>
-        <button id="checkoutBtn" class="primary-btn">Complete Transaction</button>
+        <button id="checkoutBtn" class="primary-btn">Complete Purchase</button>
     </div>
 </main>
 <script src="script.js"></script>
