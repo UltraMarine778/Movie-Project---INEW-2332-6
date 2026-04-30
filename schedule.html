@@ -1,23 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Schedule - TwoKies</title>
+    <title>Schedule & Concessions - TwoKies</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a></div></nav>
+    <nav>
+        <div class="brand">TwoKies</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="admin.html">Admin</a>
+        </div>
+    </nav>
 </header>
 <main>
     <div class="container">
-        <h2>Concessions</h2>
-        <div id="concessionArea" class="concession-grid"></div>
+        <section>
+            <h2>Movie Showtimes</h2>
+            <label>Select a Theater:</label>
+            <select id="viewerTheater" style="max-width:300px; margin: 0 auto 20px auto;"></select>
+            <div id="scheduleDisplay" class="concession-grid">
+                </div>
+        </section>
 
-        <hr>
-        <h3>Your Order</h3>
-        <ul id="cartList" style="list-style:none; padding:0;"></ul>
-        <div class="total-display">Total: $<span id="cartTotal">0.00</span></div>
-        <button id="checkoutBtn" class="primary-btn">Complete Purchase</button>
+        <hr style="margin:40px 0;">
+
+        <section>
+            <h2>Concessions Menu</h2>
+            <div id="concessionArea" class="concession-grid">
+                </div>
+
+            <div style="margin-top:30px; background:white; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                <h3>Your Order</h3>
+                <ul id="cartList" style="list-style:none; padding:0; text-align:left; max-width:400px; margin:0 auto;"></ul>
+                <div style="font-size:1.2em; font-weight:bold; margin:15px 0;">
+                    Total: $<span id="cartTotal">0.00</span>
+                </div>
+                <button id="checkoutBtn" class="primary-btn" style="max-width:300px;">Complete Purchase</button>
+            </div>
+        </section>
     </div>
 </main>
 <script src="script.js"></script>
