@@ -6,45 +6,62 @@
 </head>
 <body>
 <header>
-    <nav>
-        <div class="brand">TwoKies</div>
-        <div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div>
-    </nav>
+    <nav><div class="brand">TwoKies</div><div class="nav-links"><a href="index.html">Home</a><a href="schedule.html">Schedule</a><a href="admin.html">Admin</a></div></nav>
 </header>
 <main>
     <div class="container">
         <div id="loginSection" class="admin-box">
             <h2>Admin Login</h2>
-            <input type="password" id="adminPassword" placeholder="Password">
+            <input type="password" id="adminPassword">
             <button id="loginBtn" class="wide-btn">Login</button>
             <p id="loginMessage"></p>
         </div>
 
         <div id="adminMenu" class="admin-box" style="display:none;">
             <h2>Admin Panel</h2>
-            <button class="wide-btn" id="goConcessionsBtn">Concessions & Inventory</button>
-            <button class="wide-btn" id="goReportsBtn">Reports & Logs</button>
+            <button class="wide-btn" id="goMoviesBtn">1) Manage Movies</button>
+            <button class="wide-btn" id="goScheduleBtn">2) Theaters & Scheduling</button>
+            <button class="wide-btn" id="goConcessionsBtn">3) Concessions & Inventory</button>
+            <button class="wide-btn" id="goReportsBtn">4) Reports</button>
             <button class="wide-btn secondary" id="logoutBtn">Logout</button>
+        </div>
+
+        <div id="movieAdmin" class="admin-box" style="display:none;">
+            <h2>Manage Movie Catalog</h2>
+            <input type="text" id="catalogTitle" placeholder="Movie Title">
+            <input type="text" id="catalogGenre" placeholder="Genre">
+            <button id="saveCatalogMovieBtn" class="wide-btn">Add Movie</button>
+            <ul id="catalogList"></ul>
+            <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
+        </div>
+
+        <div id="scheduleAdmin" class="admin-box" style="display:none;">
+            <h2>Theaters & Scheduling</h2>
+            <input type="text" id="newTheaterName" placeholder="Theater Name">
+            <button id="addTheaterBtn" class="wide-btn">Add Theater</button>
+            <hr>
+            <h3>Schedule a Showtime</h3>
+            <select id="schedTheater"></select>
+            <select id="schedMovie"></select>
+            <input type="time" id="schedTime">
+            <button id="saveShowtimeBtn" class="wide-btn">Save Showtime</button>
+            <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
 
         <div id="concessionAdmin" class="admin-box" style="display:none;">
             <h2>Inventory Management</h2>
             <input type="text" id="conName" placeholder="Item Name">
-            <select id="conCategory" class="wide-btn" style="background:white; color:black; border: 1px solid #ccc;">
-                <option value="Snacks">Snacks</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Meals">Meals</option>
-            </select>
+            <select id="conCategory"><option value="Snacks">Snacks</option><option value="Drinks">Drinks</option></select>
             <input type="number" id="conPrice" step="0.01" placeholder="Price">
             <input type="number" id="conStock" placeholder="Initial Stock">
-            <button id="saveConcessionBtn" class="wide-btn">Add to Inventory</button>
-            <ul id="adminConcessionList" style="text-align:left;"></ul>
+            <button id="saveConcessionBtn" class="wide-btn">Save Item</button>
+            <ul id="adminConcessionList"></ul>
             <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
 
         <div id="reportAdmin" class="admin-box" style="display:none;">
-            <h2>System Reports</h2>
-            <div id="reportOutput" class="report-output" style="text-align:left;"></div>
+            <h2>Reports</h2>
+            <div id="reportOutput" style="text-align:left;"></div>
             <button class="wide-btn secondary" onclick="showAdminSection('adminMenu')">Back</button>
         </div>
     </div>
