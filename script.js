@@ -1,785 +1,275 @@
-
-// SIMPLE ADMIN PASSWORD (demo only)
 const ADMIN_PASSWORD = "TwoKies123";
+const TICKET_PRICE = 12.00;
+const TAX_RATE = 0.0825;
+const LOW_STOCK_LIMIT = 5;
 
-/* -----------------------------
-   STORAGE HELPERS
---------------------------------*/
-function getTheaters() {
-    return JSON.parse(localStorage.getItem("theaters")) || [];
-}
-function saveTheaters(theaters) {
-    localStorage.setItem("theaters", JSON.stringify(theaters));
-}
+document.addEventListener("DOMContentLoaded", function () {
+    const loginBtn = document.getElementById("loginBtn");
+    const addMovieBtn = document.getElementById("addMovieBtn");
+    const boxOfficeSellBtn = document.getElementById("boxOfficeSellBtn");
 
-function getMovieCatalog() {
-    return JSON.parse(localStorage.getItem("movieCatalog")) || [];
-}
-function saveMovieCatalog(catalog) {
-    localStorage.setItem("movieCatalog", JSON.stringify(catalog));
-}
+    if (loginBtn) loginBtn.addEventListener("click", checkPassword);
+    if (addMovieBtn) addMovieBtn.addEventListener("click", addMovie);
+    if (boxOfficeSellBtn) boxOfficeSellBtn.addEventListener("click", processBoxOfficeSale);
 
-function getShowtimes() {
-    return JSON.parse(localStorage.getItem("showtimes")) || [];
-}
-function saveShowtimes(showtimes) {
-    localStorage.setItem("showtimes", JSON.stringify(showtimes));
-}
-
-function getCart() {
-    return JSON.parse(localStorage.getItem("cart")) || [];
-}
-function saveCart(cart) {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-function getTickets() {
-    return JSON.parse(localStorage.getItem("tickets")) || [];
-}
-function saveTickets(tickets) {
-    localStorage.setItem("tickets", JSON.stringify(tickets));
-}
-
-/* -----------------------------
-   UTILS
---------------------------------*/
-function generateConfirmationCode() {
-    return "TK-" + Date.now().toString(36).toUpperCase();
-}
-
-function byId(id) { return document.getElementById(id); }
-
-function safeText(s) {
-    return (s ?? "").toString();
-}
-
-function parseISODate(dateStr) {
-    // dateStr like "2026-04-15" -> Date at local midnight
-    if (!dateStr) return null;
-    const [y, m, d] = dateStr.split("-").map(Number);
-    return new Date(y, (m - 1), d);
-}
-
-function withinInclusive(date, start, end) {
-    if (!date || !start || !end) return false;
-    return date.getTime() >= start.getTime() && date.getTime() <= end.getTime();
-}
-
-/* -----------------------------
-   INIT
---------------------------------*/
-document.addEventListener("DOMContentLoaded", () => {
-    initAdminPage();
-    initSchedulePage();
+    seedConcessions();
+    loadMovies();
+    loadConcessions();
+    loadEmployees();
+    loadEmployeeSchedules();
+    loadSalesReport();
 });
 
-/* -----------------------------
-   ADMIN PAGE
---------------------------------*/
-function initAdminPage() {
-    const loginBtn = byId("loginBtn");
-    if (!loginBtn) return; // not on admin page
-
-    // Wire login
-    loginBtn.addEventListener("click", checkPassword);
-
-    // Wire menu buttons
-    byId("goMoviesBtn").addEventListener("click", () => showAdminSection("movieAdmin"));
-    byId("goScheduleBtn").addEventListener("click", () => showAdminSection("scheduleAdmin"));
-    byId("goReportsBtn").addEventListener("click", () => showAdminSection("reportAdmin"));
-    byId("logoutBtn").addEventListener("click", logoutAdmin);
-
-    byId("backFromMoviesBtn").addEventListener("click", () => showAdminSection("adminMenu"));
-    byId("backFromScheduleBtn").addEventListener("click", () => showAdminSection("adminMenu"));
-    byId("backFromReportsBtn").addEventListener("click", () => showAdminSection("adminMenu"));
-
-    // Wire catalog save
-    byId("saveCatalogMovieBtn").addEventListener("click", addMovieToCatalog);
-
-    // Wire theater/auditorium
-    byId("addTheaterBtn").addEventListener("click", addTheater);
-    byId("addAuditoriumBtn").addEventListener("click", addAuditorium);
-
-    // Wire scheduling
-    byId("scheduleShowtimeBtn").addEventListener("click", scheduleShowtime);
-
-    // Wire box office
-    byId("boxOfficeSellBtn").addEventListener("click", processBoxOfficeSale);
-
-    // Wire report
-    byId("generateReportBtn").addEventListener("click", generateReport);
-
-    // Populate admin dropdowns/lists once logged in
-    // (but also safe to pre-load in case you want to see defaults)
-    seedDefaultsIfEmpty();
-    refreshAdminUI();
-}
-
-function seedDefaultsIfEmpty() {
-    // Seed theaters only if empty (optional convenience)
-    const theaters = getTheaters();
-    if (theaters.length === 0) {
-        saveTheaters([
-            { id: Date.now(), name: "North Theater", auditoriums: ["Auditorium 1", "Auditorium 2"] },
-            { id: Date.now() + 1, name: "Downtown Theater", auditoriums: ["Auditorium 1"] },
-            { id: Date.now() + 2, name: "West Theater", auditoriums: ["Auditorium 1"] }
-        ]);
-    }
-}
-
 function checkPassword() {
-    const input = byId("adminPassword").value;
-    const msg = byId("loginMessage");
+    const input = document.getElementById("adminPassword").value;
+    const msg = document.getElementById("loginMessage");
 
     if (input === ADMIN_PASSWORD) {
-        byId("loginSection").style.display = "none";
-        byId("adminMenu").style.display = "block";
-        msg.textContent = "";
-        refreshAdminUI();
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        loadMovies();
+        loadConcessions();
+        loadEmployees();
+        loadEmployeeSchedules();
+        loadSalesReport();
     } else {
         msg.textContent = "Incorrect password.";
         msg.style.color = "red";
     }
 }
 
-function logoutAdmin() {
-    // Demo logout just returns to login screen
-    byId("adminPassword").value = "";
-    byId("loginMessage").textContent = "";
-    ["adminMenu", "movieAdmin", "scheduleAdmin", "reportAdmin"].forEach(id => {
-        const el = byId(id);
-        if (el) el.style.display = "none";
-    });
-    byId("loginSection").style.display = "block";
+function getMovies() {
+    return JSON.parse(localStorage.getItem("movies")) || [];
 }
 
-function showAdminSection(sectionId) {
-    ["adminMenu", "movieAdmin", "scheduleAdmin", "reportAdmin"].forEach(id => {
-        const el = byId(id);
-        if (el) el.style.display = (id === sectionId) ? "block" : "none";
-    });
-    refreshAdminUI();
+function saveMovies(movies) {
+    localStorage.setItem("movies", JSON.stringify(movies));
 }
 
-function refreshAdminUI() {
-    renderCatalogList();
-    populateAdminTheaterSelects();
-    populateAdminMovieSelect();
-    renderShowtimeList();
-    populateBoxOfficeShowtimes();
-    populateReportTheaters();
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
-/* -----------------------------
-   MOVIE CATALOG (ADMIN)
---------------------------------*/
-function addMovieToCatalog() {
-    const title = safeText(byId("catalogTitle").value).trim();
-    const description = safeText(byId("catalogDescription").value).trim();
-    const genre = safeText(byId("catalogGenre").value).trim();
-    const runtimeVal = safeText(byId("catalogRuntime").value).trim();
+function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
-    const msg = byId("catalogMessage");
-    if (!title || !description || !genre || !runtimeVal) {
+function getSales() {
+    return JSON.parse(localStorage.getItem("sales")) || [];
+}
+
+function saveSales(sales) {
+    localStorage.setItem("sales", JSON.stringify(sales));
+}
+
+function getConcessions() {
+    return JSON.parse(localStorage.getItem("concessions")) || [];
+}
+
+function saveConcessions(items) {
+    localStorage.setItem("concessions", JSON.stringify(items));
+}
+
+function getEmployees() {
+    return JSON.parse(localStorage.getItem("employees")) || [];
+}
+
+function saveEmployees(data) {
+    localStorage.setItem("employees", JSON.stringify(data));
+}
+
+function getSchedules() {
+    return JSON.parse(localStorage.getItem("employeeSchedules")) || [];
+}
+
+function saveSchedules(data) {
+    localStorage.setItem("employeeSchedules", JSON.stringify(data));
+}
+
+function generateConfirmationCode() {
+    return "TK-" + Date.now().toString(36).toUpperCase();
+}
+
+function money(amount) {
+    return "$" + amount.toFixed(2);
+}
+
+function seedConcessions() {
+    const existing = getConcessions();
+
+    if (existing.length > 0) return;
+
+    const starterItems = [
+        { id: Date.now() + 1, name: "Small Popcorn", category: "Popcorn", price: 5.99, stock: 25, active: true },
+        { id: Date.now() + 2, name: "Medium Popcorn", category: "Popcorn", price: 7.99, stock: 25, active: true },
+        { id: Date.now() + 3, name: "Large Popcorn", category: "Popcorn", price: 9.99, stock: 25, active: true },
+        { id: Date.now() + 4, name: "Small Drink", category: "Drinks", price: 3.99, stock: 30, active: true },
+        { id: Date.now() + 5, name: "Medium Drink", category: "Drinks", price: 4.99, stock: 30, active: true },
+        { id: Date.now() + 6, name: "Large Drink", category: "Drinks", price: 5.99, stock: 30, active: true },
+        { id: Date.now() + 7, name: "Mozzarella Sticks", category: "Food", price: 8.99, stock: 15, active: true },
+        { id: Date.now() + 8, name: "Chicken Tenders", category: "Food", price: 10.99, stock: 15, active: true },
+        { id: Date.now() + 9, name: "Buffalo Wings", category: "Food", price: 11.99, stock: 15, active: true },
+        { id: Date.now() + 10, name: "Pepperoni Pizza", category: "Pizza", price: 12.99, stock: 10, active: true },
+        { id: Date.now() + 11, name: "Cheese Pizza", category: "Pizza", price: 11.99, stock: 10, active: true },
+        { id: Date.now() + 12, name: "Skittles", category: "Candy", price: 4.49, stock: 20, active: true }
+    ];
+
+    saveConcessions(starterItems);
+}
+
+function addMovie() {
+    const title = document.getElementById("movieTitle").value.trim();
+    const description = document.getElementById("movieDescription").value.trim();
+    const genre = document.getElementById("movieGenre").value.trim();
+    const runtime = document.getElementById("movieRuntime").value.trim();
+    const time = document.getElementById("movieTime").value.trim();
+    const date = document.getElementById("movieDate").value;
+    const location = document.getElementById("movieLocation").value;
+    const capacityValue = document.getElementById("movieCapacity").value.trim();
+    const msg = document.getElementById("adminMessage");
+
+    if (!title || !description || !genre || !runtime || !time || !date || !location || !capacityValue) {
         msg.textContent = "Please fill all fields.";
         msg.style.color = "red";
         return;
     }
 
-    const runtime = parseInt(runtimeVal, 10);
-    if (isNaN(runtime) || runtime <= 0) {
-        msg.textContent = "Runtime must be a positive number.";
-        msg.style.color = "red";
-        return;
-    }
+    const capacity = parseInt(capacityValue, 10);
 
-    const catalog = getMovieCatalog();
-    catalog.push({
-        id: Date.now(),
-        title, description, genre, runtime
-    });
-    saveMovieCatalog(catalog);
-
-    byId("catalogTitle").value = "";
-    byId("catalogDescription").value = "";
-    byId("catalogGenre").value = "";
-    byId("catalogRuntime").value = "";
-
-    msg.textContent = "Movie saved to catalog!";
-    msg.style.color = "green";
-    refreshAdminUI();
-}
-
-function renderCatalogList() {
-    const ul = byId("catalogList");
-    if (!ul) return;
-
-    const catalog = getMovieCatalog();
-    ul.innerHTML = "";
-
-    if (catalog.length === 0) {
-        ul.innerHTML = "<li>No movies in catalog yet.</li>";
-        return;
-    }
-
-    catalog.forEach((m, idx) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <div>
-                <strong>${m.title}</strong><br>
-                Genre: ${m.genre} | Runtime: ${m.runtime} min<br>
-                ${m.description}
-            </div>
-            <button onclick="deleteCatalogMovie(${idx})">Delete</button>
-        `;
-        ul.appendChild(li);
-    });
-}
-
-function deleteCatalogMovie(index) {
-    const catalog = getMovieCatalog();
-    const removed = catalog[index];
-    if (!removed) return;
-
-    // Remove catalog movie
-    catalog.splice(index, 1);
-    saveMovieCatalog(catalog);
-
-    // Also remove any showtimes that referenced this movie
-    const showtimes = getShowtimes().filter(s => s.movieId !== removed.id);
-    saveShowtimes(showtimes);
-
-    // Also remove any cart items for removed showtimes
-    const cart = getCart().filter(c => showtimes.some(s => s.id === c.showtimeId));
-    saveCart(cart);
-
-    refreshAdminUI();
-}
-
-/* -----------------------------
-   THEATERS / AUDITORIUMS (ADMIN)
---------------------------------*/
-function addTheater() {
-    const name = safeText(byId("newTheaterName").value).trim();
-    const msg = byId("theaterMessage");
-
-    if (!name) {
-        msg.textContent = "Enter a theater name.";
-        msg.style.color = "red";
-        return;
-    }
-
-    const theaters = getTheaters();
-    const exists = theaters.some(t => t.name.toLowerCase() === name.toLowerCase());
-    if (exists) {
-        msg.textContent = "That theater already exists.";
-        msg.style.color = "red";
-        return;
-    }
-
-    theaters.push({ id: Date.now(), name, auditoriums: ["Auditorium 1"] });
-    saveTheaters(theaters);
-
-    byId("newTheaterName").value = "";
-    msg.textContent = "Theater added!";
-    msg.style.color = "green";
-    refreshAdminUI();
-}
-
-function addAuditorium() {
-    const theaterId = parseInt(byId("audTheaterSelect").value, 10);
-    const audName = safeText(byId("newAuditoriumName").value).trim();
-    const msg = byId("auditoriumMessage");
-
-    if (isNaN(theaterId)) {
-        msg.textContent = "Select a theater.";
-        msg.style.color = "red";
-        return;
-    }
-    if (!audName) {
-        msg.textContent = "Enter an auditorium name.";
-        msg.style.color = "red";
-        return;
-    }
-
-    const theaters = getTheaters();
-    const theater = theaters.find(t => t.id === theaterId);
-    if (!theater) return;
-
-    const exists = (theater.auditoriums || []).some(a => a.toLowerCase() === audName.toLowerCase());
-    if (exists) {
-        msg.textContent = "That auditorium already exists for this theater.";
-        msg.style.color = "red";
-        return;
-    }
-
-    theater.auditoriums = theater.auditoriums || [];
-    theater.auditoriums.push(audName);
-    saveTheaters(theaters);
-
-    byId("newAuditoriumName").value = "";
-    msg.textContent = "Auditorium added!";
-    msg.style.color = "green";
-    refreshAdminUI();
-}
-
-function populateAdminTheaterSelects() {
-    const theaters = getTheaters();
-
-    const selects = ["audTheaterSelect", "schedTheaterSelect", "reportTheater"].map(byId).filter(Boolean);
-    selects.forEach(sel => {
-        sel.innerHTML = "";
-        theaters.forEach(t => {
-            const opt = document.createElement("option");
-            opt.value = t.id;
-            opt.textContent = t.name;
-            sel.appendChild(opt);
-        });
-    });
-
-    // When scheduling theater changes, update auditorium dropdown
-    const schedTheaterSelect = byId("schedTheaterSelect");
-    if (schedTheaterSelect) {
-        schedTheaterSelect.onchange = populateSchedAuditoriums;
-        populateSchedAuditoriums();
-    }
-}
-
-function populateSchedAuditoriums() {
-    const theaterId = parseInt(byId("schedTheaterSelect")?.value, 10);
-    const audSel = byId("schedAuditoriumSelect");
-    if (!audSel) return;
-
-    audSel.innerHTML = "";
-
-    const theater = getTheaters().find(t => t.id === theaterId);
-    const auds = theater?.auditoriums || [];
-
-    if (auds.length === 0) {
-        const opt = document.createElement("option");
-        opt.textContent = "No auditoriums (add one above)";
-        opt.disabled = true;
-        opt.selected = true;
-        audSel.appendChild(opt);
-        return;
-    }
-
-    auds.forEach(a => {
-        const opt = document.createElement("option");
-        opt.value = a;
-        opt.textContent = a;
-        audSel.appendChild(opt);
-    });
-}
-
-/* -----------------------------
-   SCHEDULING SHOWTIMES (ADMIN)
---------------------------------*/
-function populateAdminMovieSelect() {
-    const sel = byId("schedMovieSelect");
-    if (!sel) return;
-
-    const catalog = getMovieCatalog();
-    sel.innerHTML = "";
-
-    if (catalog.length === 0) {
-        const opt = document.createElement("option");
-        opt.textContent = "No movies in catalog (create one first)";
-        opt.disabled = true;
-        opt.selected = true;
-        sel.appendChild(opt);
-        return;
-    }
-
-    catalog.forEach(m => {
-        const opt = document.createElement("option");
-        opt.value = m.id;
-        opt.textContent = `${m.title} (${m.runtime} min)`;
-        sel.appendChild(opt);
-    });
-}
-
-function scheduleShowtime() {
-    const theaterId = parseInt(byId("schedTheaterSelect").value, 10);
-    const auditorium = safeText(byId("schedAuditoriumSelect").value).trim();
-    const movieId = parseInt(byId("schedMovieSelect").value, 10);
-    const date = byId("schedDate").value;
-    const time = safeText(byId("schedTime").value).trim();
-    const capacityVal = safeText(byId("schedCapacity").value).trim();
-
-    const msg = byId("schedMessage");
-
-    if (isNaN(theaterId) || !auditorium || isNaN(movieId) || !date || !time || !capacityVal) {
-        msg.textContent = "Please fill all fields (and ensure you have movies + auditoriums).";
-        msg.style.color = "red";
-        return;
-    }
-
-    const capacity = parseInt(capacityVal, 10);
     if (isNaN(capacity) || capacity <= 0) {
         msg.textContent = "Capacity must be a positive number.";
         msg.style.color = "red";
         return;
     }
 
-    const theaters = getTheaters();
-    const theater = theaters.find(t => t.id === theaterId);
-    if (!theater) return;
+    const movies = getMovies();
 
-    const showtimes = getShowtimes();
-    showtimes.push({
+    movies.push({
         id: Date.now(),
-        movieId,
-        theaterId,
-        theaterName: theater.name,
-        auditorium,
-        date,
+        title,
+        description,
+        genre,
+        runtime,
         time,
+        date,
+        location,
         capacity,
         ticketsSold: 0
     });
-    saveShowtimes(showtimes);
 
-    byId("schedDate").value = "";
-    byId("schedTime").value = "";
-    byId("schedCapacity").value = "";
+    saveMovies(movies);
 
-    msg.textContent = "Showtime scheduled!";
+    document.getElementById("movieTitle").value = "";
+    document.getElementById("movieDescription").value = "";
+    document.getElementById("movieGenre").value = "";
+    document.getElementById("movieRuntime").value = "";
+    document.getElementById("movieTime").value = "";
+    document.getElementById("movieDate").value = "";
+    document.getElementById("movieCapacity").value = "";
+
+    msg.textContent = "Movie added!";
     msg.style.color = "green";
-    refreshAdminUI();
+
+    loadMovies();
 }
 
-function renderShowtimeList() {
-    const ul = byId("showtimeList");
-    if (!ul) return;
+function loadMovies() {
+    const movieList = document.getElementById("movieList");
+    const scheduleList = document.getElementById("scheduleList");
+    const movies = getMovies();
 
-    const showtimes = getShowtimes();
-    const catalog = getMovieCatalog();
-    ul.innerHTML = "";
+    if (movieList) {
+        movieList.innerHTML = "";
 
-    if (showtimes.length === 0) {
-        ul.innerHTML = "<li>No showtimes scheduled.</li>";
-        return;
-    }
+        if (movies.length === 0) {
+            movieList.innerHTML = "<li>No movies scheduled.</li>";
+        } else {
+            movies.forEach((movie, index) => {
+                const remaining = movie.capacity - (movie.ticketsSold || 0);
 
-    showtimes
-        .slice()
-        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
-        .forEach((s, idx) => {
-            const movie = catalog.find(m => m.id === s.movieId);
-            const title = movie ? movie.title : "(Movie removed)";
-            const remaining = s.capacity - (s.ticketsSold || 0);
-
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <div>
-                    <strong>${title}</strong><br>
-                    ${s.date} ${s.time} — ${s.theaterName} — ${s.auditorium}<br>
-                    Capacity: ${s.capacity} | Sold: ${s.ticketsSold || 0} | Remaining: ${remaining}
-                </div>
-                <button onclick="deleteShowtime(${idx})">Delete</button>
-            `;
-            ul.appendChild(li);
-        });
-}
-
-function deleteShowtime(index) {
-    const showtimes = getShowtimes();
-    const removed = showtimes[index];
-    if (!removed) return;
-
-    // Remove showtime
-    showtimes.splice(index, 1);
-    saveShowtimes(showtimes);
-
-    // Remove from cart
-    const cart = getCart().filter(c => c.showtimeId !== removed.id);
-    saveCart(cart);
-
-    // Remove tickets for that showtime
-    const tickets = getTickets().filter(t => t.showtimeId !== removed.id);
-    saveTickets(tickets);
-
-    refreshAdminUI();
-}
-
-/* -----------------------------
-   BOX OFFICE SALES (ADMIN)
---------------------------------*/
-function populateBoxOfficeShowtimes() {
-    const select = byId("boxOfficeShowtime");
-    if (!select) return;
-
-    const showtimes = getShowtimes();
-    const catalog = getMovieCatalog();
-    select.innerHTML = "";
-
-    if (showtimes.length === 0) {
-        const opt = document.createElement("option");
-        opt.textContent = "No showtimes available";
-        opt.disabled = true;
-        opt.selected = true;
-        select.appendChild(opt);
-        return;
-    }
-
-    showtimes.forEach(s => {
-        const movie = catalog.find(m => m.id === s.movieId);
-        const title = movie ? movie.title : "(Movie removed)";
-        const remaining = s.capacity - (s.ticketsSold || 0);
-
-        const opt = document.createElement("option");
-        opt.value = s.id;
-
-        let text = `${title} — ${s.date} ${s.time} @ ${s.theaterName} (${s.auditorium}) (Remaining: ${remaining})`;
-        if (remaining <= 0) {
-            text += " [SOLD OUT]";
-            opt.disabled = true;
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div>
+                        <strong>${movie.title}</strong><br>
+                        ${movie.time} - ${movie.date} - ${movie.location}<br>
+                        Capacity: ${movie.capacity} |
+                        Sold: ${movie.ticketsSold || 0} |
+                        Remaining: ${remaining}
+                    </div>
+                    <button onclick="deleteMovie(${index})">Delete</button>
+                `;
+                movieList.appendChild(li);
+            });
         }
-        opt.textContent = text;
-        select.appendChild(opt);
-    });
-}
-
-function processBoxOfficeSale() {
-    const select = byId("boxOfficeShowtime");
-    const qtyInput = byId("boxOfficeQuantity");
-    const msg = byId("boxOfficeMessage");
-    if (!select || !qtyInput || !msg) return;
-
-    const showtimeId = parseInt(select.value, 10);
-    const quantity = parseInt(qtyInput.value, 10);
-
-    if (isNaN(showtimeId)) {
-        msg.textContent = "Please select a valid showtime.";
-        msg.style.color = "red";
-        return;
-    }
-    if (isNaN(quantity) || quantity <= 0) {
-        msg.textContent = "Enter a valid ticket quantity.";
-        msg.style.color = "red";
-        return;
     }
 
-    const showtimes = getShowtimes();
-    const s = showtimes.find(x => x.id === showtimeId);
-    if (!s) {
-        msg.textContent = "Showtime not found.";
-        msg.style.color = "red";
-        return;
+    if (scheduleList) {
+        displaySchedule(movies);
     }
-
-    const remaining = s.capacity - (s.ticketsSold || 0);
-    if (quantity > remaining) {
-        msg.textContent = `Only ${remaining} tickets remaining for this showtime.`;
-        msg.style.color = "red";
-        return;
-    }
-
-    s.ticketsSold = (s.ticketsSold || 0) + quantity;
-
-    const tickets = getTickets();
-    const confirmationCode = generateConfirmationCode();
-    tickets.push({
-        confirmationCode,
-        showtimeId: s.id,
-        quantity,
-        channel: "boxOffice",
-        timestamp: new Date().toISOString()
-    });
-
-    saveShowtimes(showtimes);
-    saveTickets(tickets);
-
-    msg.textContent = `Sale complete! Confirmation code: ${confirmationCode}`;
-    msg.style.color = "green";
-
-    qtyInput.value = "1";
-    refreshAdminUI();
-}
-
-/* -----------------------------
-   REPORTS (ADMIN)
-   Tickets sold by theater + date range (by SHOW DATE)
---------------------------------*/
-function populateReportTheaters() {
-    const sel = byId("reportTheater");
-    if (!sel) return;
-    // already populated in populateAdminTheaterSelects()
-}
-
-function generateReport() {
-    const sel = byId("reportTheater");
-    const output = byId("reportOutput");
-    const startStr = byId("reportStart").value;
-    const endStr = byId("reportEnd").value;
-
-    if (!sel || !output) return;
-
-    const theaterId = parseInt(sel.value, 10);
-    const theaters = getTheaters();
-    const theater = theaters.find(t => t.id === theaterId);
-
-    if (!theater) {
-        output.innerHTML = `<p style="color:red;">Select a theater.</p>`;
-        return;
-    }
-    if (!startStr || !endStr) {
-        output.innerHTML = `<p style="color:red;">Select both a start and end date.</p>`;
-        return;
-    }
-
-    const start = parseISODate(startStr);
-    const end = parseISODate(endStr);
-    // include whole end day by adding 23:59:59
-    end.setHours(23, 59, 59, 999);
-
-    const showtimes = getShowtimes().filter(s => s.theaterId === theaterId);
-    const catalog = getMovieCatalog();
-
-    const inRange = showtimes.filter(s => {
-        const d = parseISODate(s.date);
-        return withinInclusive(d, start, end);
-    });
-
-    const totalTickets = inRange.reduce((sum, s) => sum + (s.ticketsSold || 0), 0);
-
-    // breakdown by date
-    const byDate = {};
-    inRange.forEach(s => {
-        byDate[s.date] = (byDate[s.date] || 0) + (s.ticketsSold || 0);
-    });
-
-    // breakdown by showtime
-    const details = inRange
-        .slice()
-        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
-        .map(s => {
-            const movie = catalog.find(m => m.id === s.movieId);
-            const title = movie ? movie.title : "(Movie removed)";
-            return `<li>${s.date} ${s.time} — <strong>${title}</strong> (${s.auditorium}) : ${s.ticketsSold || 0} sold</li>`;
-        })
-        .join("");
-
-    const dateLines = Object.keys(byDate).sort().map(d => `<li>${d}: ${byDate[d]} sold</li>`).join("");
-
-    output.innerHTML = `
-        <h3>Sales Report</h3>
-        <p><strong>Theater:</strong> ${theater.name}</p>
-        <p><strong>Date Range:</strong> ${startStr} to ${endStr}</p>
-        <p><strong>Total Tickets Sold:</strong> ${totalTickets}</p>
-
-        <h4>By Date</h4>
-        <ul>${dateLines || "<li>No sales in range.</li>"}</ul>
-
-        <h4>By Showtime</h4>
-        <ul>${details || "<li>No showtimes in range.</li>"}</ul>
-    `;
-}
-
-/* -----------------------------
-   VIEWER SCHEDULE PAGE
---------------------------------*/
-function initSchedulePage() {
-    const theaterSelect = byId("viewerTheater");
-    if (!theaterSelect) return; // not on schedule page
-
-    seedDefaultsIfEmpty();
-    populateViewerTheaters();
-
-    byId("viewerFilterBtn").addEventListener("click", loadTheaterSchedule);
-    byId("checkoutBtn").addEventListener("click", checkout);
 
     loadCart();
+    loadCustomerConcessions();
+    populateBoxOfficeShowtimes();
+    populateShiftShowtimes();
 }
 
-function populateViewerTheaters() {
-    const select = byId("viewerTheater");
-    const theaters = getTheaters();
+function displaySchedule(movies) {
+    const list = document.getElementById("scheduleList");
+    if (!list) return;
 
-    // Keep the placeholder option
-    select.innerHTML = `<option value="">-- Choose Theater --</option>`;
+    list.innerHTML = "";
 
-    theaters.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t.id;
-        opt.textContent = t.name;
-        select.appendChild(opt);
+    if (movies.length === 0) {
+        list.innerHTML = "<li>No movies scheduled.</li>";
+        return;
+    }
+
+    movies.forEach(movie => {
+        const remaining = movie.capacity - (movie.ticketsSold || 0);
+        const soldOut = remaining <= 0;
+
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <div>
+                <strong>${movie.title}</strong><br>
+                ${movie.time} - ${movie.date} - ${movie.location}
+                ${soldOut ? '<span class="sold-out">Sold Out</span>' : ''}
+                <div id="details-${movie.id}" class="movie-details" style="display:none;">
+                    <p><strong>Genre:</strong> ${movie.genre}</p>
+                    <p><strong>Runtime:</strong> ${movie.runtime} minutes</p>
+                    <p><strong>Description:</strong> ${movie.description}</p>
+                    <p><strong>Remaining Seats:</strong> ${remaining}</p>
+                    <p><strong>Ticket Price:</strong> ${money(TICKET_PRICE)}</p>
+                </div>
+            </div>
+            <div>
+                <button onclick="toggleDetails(${movie.id}, this)">View Details</button><br><br>
+                <label>Qty</label>
+                <select id="qty-${movie.id}" ${soldOut ? "disabled" : ""}>
+                    ${buildQuantityOptions(Math.min(remaining, 30))}
+                </select>
+                <button onclick="addTicketToCart(${movie.id})" ${soldOut ? "disabled" : ""}>Add Ticket</button>
+            </div>
+        `;
+
+        list.appendChild(li);
     });
 }
 
-function loadTheaterSchedule() {
-    const theaterId = parseInt(byId("viewerTheater").value, 10);
-    const date = byId("viewerDate").value;
+function buildQuantityOptions(max) {
+    let html = "";
 
-    const list = byId("scheduleList");
-    list.innerHTML = "";
-
-    if (isNaN(theaterId)) {
-        list.innerHTML = `<li>Please select a theater to view its schedule.</li>`;
-        return;
+    for (let i = 1; i <= max; i++) {
+        html += `<option value="${i}">${i}</option>`;
     }
 
-    const showtimes = getShowtimes().filter(s => s.theaterId === theaterId);
-    const filtered = date ? showtimes.filter(s => s.date === date) : showtimes;
-
-    displaySchedule(filtered);
-}
-
-function displaySchedule(showtimes) {
-    const list = byId("scheduleList");
-    if (!list) return;
-
-    const catalog = getMovieCatalog();
-    list.innerHTML = "";
-
-    if (showtimes.length === 0) {
-        list.innerHTML = "<li>No showtimes scheduled.</li>";
-        return;
-    }
-
-    showtimes
-        .slice()
-        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
-        .forEach(s => {
-            const movie = catalog.find(m => m.id === s.movieId);
-            const title = movie ? movie.title : "(Movie removed)";
-            const remaining = s.capacity - (s.ticketsSold || 0);
-            const soldOut = remaining <= 0;
-
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <div style="width:100%">
-                    <strong>${title}</strong><br>
-                    ${s.date} ${s.time} — ${s.theaterName} — ${s.auditorium}
-                    ${soldOut ? '<span class="sold-out">Sold Out</span>' : ''}
-
-                    <div id="details-${s.id}" class="movie-details" style="display:none;">
-                        ${movie ? `
-                            <p><strong>Genre:</strong> ${movie.genre}</p>
-                            <p><strong>Runtime:</strong> ${movie.runtime} minutes</p>
-                            <p><strong>Description:</strong> ${movie.description}</p>
-                        ` : `<p><em>Movie details unavailable.</em></p>`}
-                        <p><strong>Capacity:</strong> ${s.capacity}</p>
-                        <p><strong>Remaining Seats:</strong> ${remaining}</p>
-                    </div>
-                </div>
-
-                <div>
-                    <button onclick="toggleDetails(${s.id}, this)">View Details</button><br><br>
-                    <label for="qty-${s.id}">Qty</label>
-                    <input type="number" id="qty-${s.id}" min="1"
-                        ${!soldOut ? `max="${remaining}" value="1"` : 'value="0"'}
-                        ${soldOut ? "disabled" : ""}>
-                    <button onclick="addToCart(${s.id})" ${soldOut ? "disabled" : ""}>Add Ticket</button>
-                </div>
-            `;
-            list.appendChild(li);
-        });
+    return html;
 }
 
 function toggleDetails(id, btn) {
-    const details = byId(`details-${id}`);
+    const details = document.getElementById(`details-${id}`);
+
     if (!details) return;
 
     if (details.style.display === "none") {
@@ -791,146 +281,768 @@ function toggleDetails(id, btn) {
     }
 }
 
-/* -----------------------------
-   CART + CHECKOUT (VIEWER)
---------------------------------*/
-function addToCart(showtimeId) {
-    const qtyInput = byId(`qty-${showtimeId}`);
-    if (!qtyInput) {
-        alert("Quantity input not found.");
-        return;
-    }
+function applyFilters() {
+    const date = document.getElementById("filterDate").value;
+    const location = document.getElementById("filterLocation").value;
 
-    const quantity = parseInt(qtyInput.value, 10);
-    if (isNaN(quantity) || quantity <= 0) {
-        alert("Please enter a valid ticket quantity.");
-        return;
-    }
+    let movies = getMovies();
 
-    const showtimes = getShowtimes();
-    const s = showtimes.find(x => x.id === showtimeId);
-    if (!s) {
+    if (date) movies = movies.filter(m => m.date === date);
+    if (location) movies = movies.filter(m => m.location === location);
+
+    displaySchedule(movies);
+}
+
+function addTicketToCart(showtimeId) {
+    const qtyInput = document.getElementById(`qty-${showtimeId}`);
+    let quantity = parseInt(qtyInput.value, 10);
+
+    const movies = getMovies();
+    const movie = movies.find(m => m.id === showtimeId);
+
+    if (!movie) {
         alert("Showtime not found.");
         return;
     }
 
-    const remaining = s.capacity - (s.ticketsSold || 0);
-
+    const remaining = movie.capacity - (movie.ticketsSold || 0);
     const cart = getCart();
-    const existing = cart.find(item => item.showtimeId === showtimeId);
+
+    const existing = cart.find(item => item.type === "ticket" && item.showtimeId === showtimeId);
     const alreadyInCart = existing ? existing.quantity : 0;
 
     if (quantity + alreadyInCart > remaining) {
-        alert(`Only ${remaining - alreadyInCart} more tickets can be added to the cart for this showtime.`);
+        alert(`Only ${remaining - alreadyInCart} more tickets can be added.`);
         return;
     }
 
-    if (existing) existing.quantity += quantity;
-    else cart.push({ showtimeId, quantity });
+    if (quantity > 20) {
+        const confirmLargeOrder = confirm("You are ordering more than 20 tickets. Do you want to continue?");
+        if (!confirmLargeOrder) return;
+    }
+
+    if (existing) {
+        existing.quantity += quantity;
+    } else {
+        cart.push({
+            type: "ticket",
+            showtimeId,
+            title: movie.title,
+            date: movie.date,
+            time: movie.time,
+            location: movie.location,
+            quantity,
+            price: TICKET_PRICE
+        });
+    }
 
     saveCart(cart);
     loadCart();
-    alert("Ticket(s) added!");
 }
 
-function loadCart() {
-    const list = byId("cartList");
+function loadCustomerConcessions() {
+    const list = document.getElementById("customerConcessionList");
     if (!list) return;
 
-    const cart = getCart();
-    const showtimes = getShowtimes();
-    const catalog = getMovieCatalog();
-
+    const concessions = getConcessions().filter(item => item.active);
     list.innerHTML = "";
 
-    if (cart.length === 0) {
-        list.innerHTML = "<li>Your cart is empty.</li>";
+    if (concessions.length === 0) {
+        list.innerHTML = "<li>No concessions available.</li>";
         return;
     }
 
-    cart.forEach(item => {
-        const s = showtimes.find(x => x.id === item.showtimeId);
-        if (!s) return;
-
-        const movie = catalog.find(m => m.id === s.movieId);
-        const title = movie ? movie.title : "(Movie removed)";
+    concessions.forEach(item => {
+        const disabled = item.stock <= 0;
 
         const li = document.createElement("li");
-        li.textContent = `${title} — ${s.date} ${s.time} @ ${s.theaterName} (${s.auditorium}) (Qty: ${item.quantity})`;
+        li.innerHTML = `
+            <div>
+                <strong>${item.name}</strong><br>
+                ${item.category} - ${money(item.price)}<br>
+                Stock: ${item.stock}
+            </div>
+            <div>
+                <label>Qty</label>
+                <select id="conQty-${item.id}" ${disabled ? "disabled" : ""}>
+                    ${buildQuantityOptions(Math.min(item.stock, 20))}
+                </select>
+                <button onclick="addConcessionToCart(${item.id})" ${disabled ? "disabled" : ""}>
+                    Add
+                </button>
+            </div>
+        `;
+
         list.appendChild(li);
     });
 }
 
+function addConcessionToCart(id) {
+    const qtySelect = document.getElementById(`conQty-${id}`);
+    const quantity = parseInt(qtySelect.value, 10);
+
+    const concessions = getConcessions();
+    const item = concessions.find(c => c.id === id);
+
+    if (!item) return;
+
+    if (quantity > item.stock) {
+        alert("Not enough stock.");
+        return;
+    }
+
+    const cart = getCart();
+    const existing = cart.find(c => c.type === "concession" && c.id === id);
+
+    if (existing) {
+        if (existing.quantity + quantity > item.stock) {
+            alert("Not enough stock.");
+            return;
+        }
+
+        existing.quantity += quantity;
+    } else {
+        cart.push({
+            type: "concession",
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity
+        });
+    }
+
+    saveCart(cart);
+    loadCart();
+}
+
+function loadCart() {
+    const list = document.getElementById("cartList");
+    if (!list) return;
+
+    const cart = getCart();
+    list.innerHTML = "";
+
+    if (cart.length === 0) {
+        list.innerHTML = "<li>Your cart is empty.</li>";
+        updateTotals();
+        return;
+    }
+
+    cart.forEach((item, index) => {
+        const li = document.createElement("li");
+
+        if (item.type === "ticket") {
+            li.innerHTML = `
+                <div>
+                    <strong>Ticket:</strong> ${item.title}<br>
+                    ${item.date} ${item.time} @ ${item.location}<br>
+                    Qty: ${item.quantity} | ${money(item.price * item.quantity)}
+                </div>
+                <button onclick="removeCartItem(${index})">Remove</button>
+            `;
+        } else {
+            li.innerHTML = `
+                <div>
+                    <strong>Concession:</strong> ${item.name}<br>
+                    Qty: ${item.quantity} | ${money(item.price * item.quantity)}
+                </div>
+                <button onclick="removeCartItem(${index})">Remove</button>
+            `;
+        }
+
+        list.appendChild(li);
+    });
+
+    updateTotals();
+}
+
+function removeCartItem(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+    loadCart();
+}
+
+function updateTotals() {
+    const cart = getCart();
+
+    let subtotal = 0;
+
+    cart.forEach(item => {
+        subtotal += item.price * item.quantity;
+    });
+
+    const tax = subtotal * TAX_RATE;
+    const total = subtotal + tax;
+
+    const subEl = document.getElementById("subtotalAmount");
+    const taxEl = document.getElementById("taxAmount");
+    const totalEl = document.getElementById("totalAmount");
+
+    if (subEl) subEl.textContent = money(subtotal);
+    if (taxEl) taxEl.textContent = money(tax);
+    if (totalEl) totalEl.textContent = money(total);
+}
+
 function checkout() {
     const cart = getCart();
-    const confirmationDiv = byId("purchaseConfirmation");
-    if (confirmationDiv) confirmationDiv.innerHTML = "";
+    const confirmationDiv = document.getElementById("purchaseConfirmation");
 
     if (!cart || cart.length === 0) {
         alert("Your cart is empty.");
         return;
     }
 
-    const showtimes = getShowtimes();
-    const catalog = getMovieCatalog();
+    const movies = getMovies();
+    const concessions = getConcessions();
+    const sales = getSales();
+    const confirmationCode = generateConfirmationCode();
 
-    // Verify capacity for all items
     for (const item of cart) {
-        const s = showtimes.find(x => x.id === item.showtimeId);
-        if (!s) {
-            alert("A showtime in your cart no longer exists.");
-            return;
+        if (item.type === "ticket") {
+            const movie = movies.find(m => m.id === item.showtimeId);
+
+            if (!movie) {
+                alert("A showtime no longer exists.");
+                return;
+            }
+
+            const remaining = movie.capacity - (movie.ticketsSold || 0);
+
+            if (item.quantity > remaining) {
+                alert(`Not enough seats left for ${movie.title}.`);
+                return;
+            }
         }
-        const remaining = s.capacity - (s.ticketsSold || 0);
-        if (item.quantity > remaining) {
-            const movie = catalog.find(m => m.id === s.movieId);
-            alert(`Not enough seats left for ${movie?.title || "this showtime"}. Remaining: ${remaining}`);
-            return;
+
+        if (item.type === "concession") {
+            const con = concessions.find(c => c.id === item.id);
+
+            if (!con || item.quantity > con.stock) {
+                alert(`Not enough stock for ${item.name}.`);
+                return;
+            }
         }
     }
 
-    const tickets = getTickets();
-    const confirmationCode = generateConfirmationCode();
-    const purchaseDetails = [];
-
     cart.forEach(item => {
-        const s = showtimes.find(x => x.id === item.showtimeId);
-        const quantity = item.quantity;
+        if (item.type === "ticket") {
+            const movie = movies.find(m => m.id === item.showtimeId);
+            movie.ticketsSold += item.quantity;
 
-        s.ticketsSold = (s.ticketsSold || 0) + quantity;
+            sales.push({
+                id: Date.now() + Math.random(),
+                type: "ticket",
+                name: movie.title,
+                quantity: item.quantity,
+                amount: item.quantity * item.price,
+                channel: "online",
+                confirmationCode,
+                timestamp: new Date().toISOString()
+            });
+        }
 
-        tickets.push({
-            confirmationCode,
-            showtimeId: s.id,
-            quantity,
-            channel: "online",
-            timestamp: new Date().toISOString()
-        });
+        if (item.type === "concession") {
+            const con = concessions.find(c => c.id === item.id);
+            con.stock -= item.quantity;
 
-        const movie = catalog.find(m => m.id === s.movieId);
-        const title = movie ? movie.title : "(Movie removed)";
-
-        purchaseDetails.push(`${title} — ${s.date} ${s.time} @ ${s.theaterName} (${s.auditorium}) (Qty: ${quantity})`);
+            sales.push({
+                id: Date.now() + Math.random(),
+                type: "concession",
+                name: item.name,
+                quantity: item.quantity,
+                amount: item.quantity * item.price,
+                channel: "online",
+                confirmationCode,
+                timestamp: new Date().toISOString()
+            });
+        }
     });
 
-    saveShowtimes(showtimes);
-    saveTickets(tickets);
+    saveMovies(movies);
+    saveConcessions(concessions);
+    saveSales(sales);
     saveCart([]);
+
+    loadMovies();
+    loadConcessions();
     loadCart();
 
-    // Refresh schedule list if user is currently viewing a theater
-    if (byId("viewerTheater")) loadTheaterSchedule();
-
     if (confirmationDiv) {
-        const detailsHtml = purchaseDetails.map(d => `<li>${d}</li>`).join("");
         confirmationDiv.innerHTML = `
             <h4>Purchase Complete!</h4>
             <p>Your confirmation code:</p>
             <p><strong>${confirmationCode}</strong></p>
-            <p>Show this code at the theater to receive your tickets.</p>
-            <ul>${detailsHtml}</ul>
+            <p>Show this code at the theater.</p>
         `;
-    } else {
-        alert(`Purchase complete! Confirmation code: ${confirmationCode}`);
     }
+}
+
+function populateBoxOfficeShowtimes() {
+    const select = document.getElementById("boxOfficeShowtime");
+    if (!select) return;
+
+    const movies = getMovies();
+    select.innerHTML = "";
+
+    movies.forEach(movie => {
+        const remaining = movie.capacity - movie.ticketsSold;
+        const opt = document.createElement("option");
+
+        opt.value = movie.id;
+        opt.textContent = `${movie.title} - ${movie.date} ${movie.time} @ ${movie.location} (${remaining} left)`;
+
+        if (remaining <= 0) opt.disabled = true;
+
+        select.appendChild(opt);
+    });
+}
+
+function processBoxOfficeSale() {
+    const select = document.getElementById("boxOfficeShowtime");
+    const qtyInput = document.getElementById("boxOfficeQuantity");
+    const msg = document.getElementById("boxOfficeMessage");
+
+    const showtimeId = parseInt(select.value, 10);
+    const quantity = parseInt(qtyInput.value, 10);
+
+    const movies = getMovies();
+    const movie = movies.find(m => m.id === showtimeId);
+
+    if (!movie) {
+        msg.textContent = "Showtime not found.";
+        msg.style.color = "red";
+        return;
+    }
+
+    const remaining = movie.capacity - movie.ticketsSold;
+
+    if (quantity > remaining) {
+        msg.textContent = `Only ${remaining} tickets left.`;
+        msg.style.color = "red";
+        return;
+    }
+
+    movie.ticketsSold += quantity;
+
+    const sales = getSales();
+
+    sales.push({
+        id: Date.now(),
+        type: "ticket",
+        name: movie.title,
+        quantity,
+        amount: quantity * TICKET_PRICE,
+        channel: "boxOffice",
+        confirmationCode: generateConfirmationCode(),
+        timestamp: new Date().toISOString()
+    });
+
+    saveMovies(movies);
+    saveSales(sales);
+
+    msg.textContent = "Ticket sale complete.";
+    msg.style.color = "green";
+
+    qtyInput.value = "1";
+
+    loadMovies();
+    loadSalesReport();
+}
+
+function addConcession() {
+    const name = document.getElementById("conName").value.trim();
+    const category = document.getElementById("conCategory").value.trim();
+    const price = parseFloat(document.getElementById("conPrice").value);
+    const stock = parseInt(document.getElementById("conStock").value, 10);
+
+    if (!name || !category || isNaN(price) || isNaN(stock)) {
+        alert("Please fill out all concession fields.");
+        return;
+    }
+
+    const concessions = getConcessions();
+
+    concessions.push({
+        id: Date.now(),
+        name,
+        category,
+        price,
+        stock,
+        active: true
+    });
+
+    saveConcessions(concessions);
+
+    document.getElementById("conName").value = "";
+    document.getElementById("conCategory").value = "";
+    document.getElementById("conPrice").value = "";
+    document.getElementById("conStock").value = "";
+
+    loadConcessions();
+}
+
+function loadConcessions() {
+    const list = document.getElementById("concessionList");
+    const lowList = document.getElementById("lowStockList");
+    const posSelect = document.getElementById("posItem");
+
+    const concessions = getConcessions();
+
+    if (list) {
+        list.innerHTML = "";
+
+        concessions.forEach(item => {
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                <div>
+                    <strong>${item.name}</strong><br>
+                    Category: ${item.category}<br>
+                    Price: ${money(item.price)}<br>
+                    Stock: ${item.stock}<br>
+                    Status: ${item.active ? "Active" : "Inactive"}
+                </div>
+                <button onclick="toggleConcessionStatus(${item.id})">
+                    ${item.active ? "Deactivate" : "Activate"}
+                </button>
+            `;
+
+            list.appendChild(li);
+        });
+    }
+
+    if (lowList) {
+        lowList.innerHTML = "";
+
+        const lowItems = concessions.filter(item => item.stock <= LOW_STOCK_LIMIT);
+
+        if (lowItems.length === 0) {
+            lowList.innerHTML = "<li>No low stock alerts.</li>";
+        } else {
+            lowItems.forEach(item => {
+                const li = document.createElement("li");
+                li.innerHTML = `<strong>${item.name}</strong> is low stock. Current stock: ${item.stock}`;
+                lowList.appendChild(li);
+            });
+        }
+    }
+
+    if (posSelect) {
+        posSelect.innerHTML = "";
+
+        concessions.filter(c => c.active).forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.id;
+            opt.textContent = `${item.name} - ${money(item.price)} - Stock: ${item.stock}`;
+            posSelect.appendChild(opt);
+        });
+    }
+
+    loadCustomerConcessions();
+}
+
+function toggleConcessionStatus(id) {
+    const concessions = getConcessions();
+    const item = concessions.find(c => c.id === id);
+
+    if (!item) return;
+
+    item.active = !item.active;
+
+    saveConcessions(concessions);
+    loadConcessions();
+}
+
+function processConcessionPOS() {
+    const select = document.getElementById("posItem");
+    const qtyInput = document.getElementById("posQuantity");
+    const msg = document.getElementById("posMessage");
+
+    const id = parseInt(select.value, 10);
+    const quantity = parseInt(qtyInput.value, 10);
+
+    const concessions = getConcessions();
+    const item = concessions.find(c => c.id === id);
+
+    if (!item) {
+        msg.textContent = "Item not found.";
+        msg.style.color = "red";
+        return;
+    }
+
+    if (quantity > item.stock) {
+        msg.textContent = "Not enough stock.";
+        msg.style.color = "red";
+        return;
+    }
+
+    item.stock -= quantity;
+
+    const sales = getSales();
+
+    sales.push({
+        id: Date.now(),
+        type: "concession",
+        name: item.name,
+        quantity,
+        amount: quantity * item.price,
+        channel: "POS",
+        timestamp: new Date().toISOString()
+    });
+
+    saveConcessions(concessions);
+    saveSales(sales);
+
+    msg.textContent = "Concession sale complete.";
+    msg.style.color = "green";
+
+    qtyInput.value = "1";
+
+    loadConcessions();
+    loadSalesReport();
+}
+
+function addEmployee() {
+    const name = document.getElementById("empName").value.trim();
+    const contact = document.getElementById("empContact").value.trim();
+    const role = document.getElementById("empRole").value.trim();
+    const hireDate = document.getElementById("empHireDate").value;
+    const pay = parseFloat(document.getElementById("empPay").value);
+    const theater = document.getElementById("empTheater").value;
+
+    if (!name || !contact || !role || !hireDate || isNaN(pay)) {
+        alert("Please fill out all employee fields.");
+        return;
+    }
+
+    const employees = getEmployees();
+
+    employees.push({
+        id: Date.now(),
+        name,
+        contact,
+        role,
+        hireDate,
+        pay,
+        theater,
+        active: true
+    });
+
+    saveEmployees(employees);
+
+    document.getElementById("empName").value = "";
+    document.getElementById("empContact").value = "";
+    document.getElementById("empRole").value = "";
+    document.getElementById("empHireDate").value = "";
+    document.getElementById("empPay").value = "";
+
+    loadEmployees();
+}
+
+function loadEmployees() {
+    const list = document.getElementById("employeeList");
+    const select = document.getElementById("shiftEmployee");
+
+    const employees = getEmployees();
+
+    if (list) {
+        list.innerHTML = "";
+
+        if (employees.length === 0) {
+            list.innerHTML = "<li>No employees added.</li>";
+        } else {
+            employees.forEach(emp => {
+                const li = document.createElement("li");
+
+                li.innerHTML = `
+                    <div>
+                        <strong>${emp.name}</strong><br>
+                        Contact: ${emp.contact}<br>
+                        Role: ${emp.role}<br>
+                        Hire Date: ${emp.hireDate}<br>
+                        Pay: ${money(emp.pay)}<br>
+                        Theater: ${emp.theater}<br>
+                        Status: ${emp.active ? "Active" : "Inactive"}
+                    </div>
+                    <button onclick="toggleEmployeeStatus(${emp.id})">
+                        ${emp.active ? "Deactivate" : "Activate"}
+                    </button>
+                `;
+
+                list.appendChild(li);
+            });
+        }
+    }
+
+    if (select) {
+        select.innerHTML = "";
+
+        employees.filter(e => e.active).forEach(emp => {
+            const opt = document.createElement("option");
+            opt.value = emp.id;
+            opt.textContent = `${emp.name} - ${emp.role}`;
+            select.appendChild(opt);
+        });
+    }
+}
+
+function toggleEmployeeStatus(id) {
+    const employees = getEmployees();
+    const emp = employees.find(e => e.id === id);
+
+    if (!emp) return;
+
+    emp.active = !emp.active;
+
+    saveEmployees(employees);
+    loadEmployees();
+}
+
+function populateShiftShowtimes() {
+    const select = document.getElementById("shiftShowtime");
+    if (!select) return;
+
+    const movies = getMovies();
+
+    select.innerHTML = "<option value=''>No showtime selected</option>";
+
+    movies.forEach(movie => {
+        const opt = document.createElement("option");
+        opt.value = movie.id;
+        opt.textContent = `${movie.title} - ${movie.date} ${movie.time} @ ${movie.location}`;
+        select.appendChild(opt);
+    });
+}
+
+function addShift() {
+    const empId = parseInt(document.getElementById("shiftEmployee").value, 10);
+    const date = document.getElementById("shiftDate").value;
+    const start = document.getElementById("shiftStart").value;
+    const end = document.getElementById("shiftEnd").value;
+    const position = document.getElementById("shiftPosition").value;
+    const showtimeId = document.getElementById("shiftShowtime").value;
+    const msg = document.getElementById("shiftMessage");
+
+    if (!empId || !date || !start || !end || !position) {
+        msg.textContent = "Please fill out all shift fields.";
+        msg.style.color = "red";
+        return;
+    }
+
+    if (end <= start) {
+        msg.textContent = "End time must be after start time.";
+        msg.style.color = "red";
+        return;
+    }
+
+    const schedules = getSchedules();
+
+    const conflict = schedules.find(s =>
+        s.empId === empId &&
+        s.date === date &&
+        !(end <= s.start || start >= s.end)
+    );
+
+    if (conflict) {
+        msg.textContent = "Schedule conflict. This employee already has a shift during that time.";
+        msg.style.color = "red";
+        return;
+    }
+
+    schedules.push({
+        id: Date.now(),
+        empId,
+        date,
+        start,
+        end,
+        position,
+        showtimeId
+    });
+
+    saveSchedules(schedules);
+
+    msg.textContent = "Shift added.";
+    msg.style.color = "green";
+
+    loadEmployeeSchedules();
+}
+
+function loadEmployeeSchedules() {
+    const list = document.getElementById("scheduleEmployeeList");
+    if (!list) return;
+
+    const schedules = getSchedules();
+    const employees = getEmployees();
+    const movies = getMovies();
+
+    list.innerHTML = "";
+
+    if (schedules.length === 0) {
+        list.innerHTML = "<li>No employee shifts scheduled.</li>";
+        return;
+    }
+
+    schedules.forEach(shift => {
+        const emp = employees.find(e => e.id === shift.empId);
+        const movie = movies.find(m => String(m.id) === String(shift.showtimeId));
+
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <div>
+                <strong>${emp ? emp.name : "Unknown Employee"}</strong><br>
+                Date: ${shift.date}<br>
+                Time: ${shift.start} - ${shift.end}<br>
+                Position: ${shift.position}<br>
+                Showtime: ${movie ? movie.title + " at " + movie.time : "Not linked"}
+            </div>
+            <button onclick="deleteShift(${shift.id})">Delete</button>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+function deleteShift(id) {
+    const schedules = getSchedules().filter(s => s.id !== id);
+    saveSchedules(schedules);
+    loadEmployeeSchedules();
+}
+
+function loadSalesReport() {
+    const ticketEl = document.getElementById("ticketSalesTotal");
+    const concessionEl = document.getElementById("concessionSalesTotal");
+    const allEl = document.getElementById("allSalesTotal");
+
+    if (!ticketEl || !concessionEl || !allEl) return;
+
+    const sales = getSales();
+
+    const ticketTotal = sales
+        .filter(s => s.type === "ticket")
+        .reduce((sum, s) => sum + s.amount, 0);
+
+    const concessionTotal = sales
+        .filter(s => s.type === "concession")
+        .reduce((sum, s) => sum + s.amount, 0);
+
+    ticketEl.textContent = money(ticketTotal);
+    concessionEl.textContent = money(concessionTotal);
+    allEl.textContent = money(ticketTotal + concessionTotal);
+}
+
+function deleteMovie(index) {
+    const movies = getMovies();
+    const removedMovie = movies[index];
+
+    if (!removedMovie) return;
+
+    movies.splice(index, 1);
+    saveMovies(movies);
+
+    const cart = getCart().filter(item => item.showtimeId !== removedMovie.id);
+    saveCart(cart);
+
+    loadMovies();
 }
