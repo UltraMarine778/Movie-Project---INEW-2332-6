@@ -5,7 +5,7 @@
     <title>Schedule - TwoKies</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="loadMovies()">
 <header>
     <nav>
         <div class="brand">TwoKies</div>
@@ -22,23 +22,35 @@
         <h2>Movie Schedule</h2>
 
         <div class="filters">
-            <label>Select Theater (required)</label>
-            <select id="viewerTheater">
-                <option value="">-- Choose Theater --</option>
+            <label>Filter by Date</label>
+            <input type="date" id="filterDate">
+
+            <label>Filter by Location</label>
+            <select id="filterLocation">
+                <option value="">All Locations</option>
+                <option value="North Theater">North Theater</option>
+                <option value="Downtown Theater">Downtown Theater</option>
+                <option value="West Theater">West Theater</option>
             </select>
 
-            <label>Optional: Filter by Date</label>
-            <input type="date" id="viewerDate">
-
-            <button id="viewerFilterBtn">Show Schedule</button>
+            <button onclick="applyFilters()">Filter</button>
         </div>
 
         <ul id="scheduleList"></ul>
 
+        <h3>Concessions</h3>
+        <ul id="customerConcessionList"></ul>
+
         <h3>Your Cart</h3>
         <ul id="cartList"></ul>
 
-        <button id="checkoutBtn">Purchase</button>
+        <div class="total-box">
+            <p>Subtotal: <strong id="subtotalAmount">$0.00</strong></p>
+            <p>Tax: <strong id="taxAmount">$0.00</strong></p>
+            <p>Total: <strong id="totalAmount">$0.00</strong></p>
+        </div>
+
+        <button id="checkoutBtn" onclick="checkout()">Purchase</button>
 
         <div id="purchaseConfirmation"></div>
     </div>
