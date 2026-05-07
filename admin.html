@@ -28,162 +28,196 @@
     </div>
 
     <div id="adminPanel" class="admin-box wide-box" style="display:none;">
+        <h2>Admin Dashboard</h2>
 
-        <h2>Schedule Showtimes</h2>
+        <div class="admin-tabs">
+            <button onclick="showAdminSection('moviesSection')">Movies</button>
+            <button onclick="showAdminSection('theatersSection')">Theaters and Auditoriums</button>
+            <button onclick="showAdminSection('concessionsSection')">Concessions</button>
+            <button onclick="showAdminSection('employeesSection')">Employees</button>
+            <button onclick="showAdminSection('reportsSection')">Reports</button>
+        </div>
 
-        <label>Movie Title</label>
-        <input type="text" id="movieTitle">
+        <!-- MOVIES SECTION -->
+        <div id="moviesSection" class="admin-section">
+            <h2>Movies</h2>
 
-        <label>Description</label>
-        <input type="text" id="movieDescription">
+            <label>Movie Title</label>
+            <input type="text" id="movieTitle">
 
-        <label>Genre</label>
-        <input type="text" id="movieGenre">
+            <label>Description</label>
+            <input type="text" id="movieDescription">
 
-        <label>Runtime</label>
-        <input type="number" id="movieRuntime">
+            <label>Genre</label>
+            <input type="text" id="movieGenre">
 
-        <label>Showtime</label>
-        <input type="text" id="movieTime">
+            <label>Runtime</label>
+            <input type="number" id="movieRuntime">
 
-        <label>Date</label>
-        <input type="date" id="movieDate">
+            <label>Showtime</label>
+            <input type="text" id="movieTime">
 
-        <label>Location</label>
-        <select id="movieLocation">
-            <option>North Theater</option>
-            <option>Downtown Theater</option>
-            <option>West Theater</option>
-        </select>
+            <label>Date</label>
+            <input type="date" id="movieDate">
 
-        <label>Capacity</label>
-        <input type="number" id="movieCapacity">
+            <label>Location</label>
+            <select id="movieLocation">
+                <option>North Theater</option>
+                <option>Downtown Theater</option>
+                <option>West Theater</option>
+            </select>
 
-        <button id="addMovieBtn">Add Movie</button>
-        <p id="adminMessage"></p>
+            <label>Capacity</label>
+            <input type="number" id="movieCapacity">
 
-        <h3>Current Schedule</h3>
-        <ul id="movieList"></ul>
+            <button id="addMovieBtn">Add Movie</button>
+            <p id="adminMessage"></p>
 
-        <hr>
+            <h3>Current Schedule</h3>
+            <ul id="movieList"></ul>
 
-        <h3>Box Office Ticket Sales</h3>
+            <h3>Box Office Ticket Sales</h3>
 
-        <label>Select Showtime</label>
-        <select id="boxOfficeShowtime"></select>
+            <label>Select Showtime</label>
+            <select id="boxOfficeShowtime"></select>
 
-        <label>Ticket Quantity</label>
-        <input type="number" id="boxOfficeQuantity" min="1" value="1">
+            <label>Ticket Quantity</label>
+            <input type="number" id="boxOfficeQuantity" min="1" value="1">
 
-        <button id="boxOfficeSellBtn">Sell Tickets</button>
-        <p id="boxOfficeMessage"></p>
+            <button id="boxOfficeSellBtn">Sell Tickets</button>
+            <p id="boxOfficeMessage"></p>
+        </div>
 
-        <hr>
+        <!-- THEATERS SECTION -->
+        <div id="theatersSection" class="admin-section" style="display:none;">
+            <h2>Theaters and Auditoriums</h2>
 
-        <h3>Manage Concessions</h3>
+            <label>Theater Name</label>
+            <input type="text" id="theaterName" placeholder="Example: North Theater">
 
-        <label>Name</label>
-        <input type="text" id="conName">
+            <label>Auditorium Name/Number</label>
+            <input type="text" id="auditoriumName" placeholder="Example: Auditorium 1">
 
-        <label>Category</label>
-        <input type="text" id="conCategory">
+            <label>Seat Capacity</label>
+            <input type="number" id="auditoriumCapacity">
 
-        <label>Price</label>
-        <input type="number" id="conPrice" step="0.01">
+            <button onclick="addAuditorium()">Add Auditorium</button>
 
-        <label>Starting Stock</label>
-        <input type="number" id="conStock">
+            <h3>Auditorium List</h3>
+            <ul id="auditoriumList"></ul>
+        </div>
 
-        <button onclick="addConcession()">Add Concession</button>
+        <!-- CONCESSIONS SECTION -->
+        <div id="concessionsSection" class="admin-section" style="display:none;">
+            <h2>Concessions</h2>
 
-        <h3>Concession Items</h3>
-        <ul id="concessionList"></ul>
+            <h3>Manage Concessions</h3>
 
-        <h3 class="alert-title">Low Stock Alerts</h3>
-        <ul id="lowStockList"></ul>
+            <label>Name</label>
+            <input type="text" id="conName">
 
-        <hr>
+            <label>Category</label>
+            <input type="text" id="conCategory">
 
-        <h3>Concession POS</h3>
+            <label>Price</label>
+            <input type="number" id="conPrice" step="0.01">
 
-        <label>Select Item</label>
-        <select id="posItem"></select>
+            <label>Starting Stock</label>
+            <input type="number" id="conStock">
 
-        <label>Quantity</label>
-        <input type="number" id="posQuantity" min="1" value="1">
+            <button onclick="addConcession()">Add Concession</button>
 
-        <button onclick="processConcessionPOS()">Complete POS Sale</button>
-        <p id="posMessage"></p>
+            <h3>Concession Items</h3>
+            <ul id="concessionList"></ul>
 
-        <hr>
+            <h3 class="alert-title">Low Stock Alerts</h3>
+            <ul id="lowStockList"></ul>
 
-        <h3>Employees</h3>
+            <h3>Concession POS</h3>
 
-        <label>Name</label>
-        <input type="text" id="empName">
+            <label>Select Item</label>
+            <select id="posItem"></select>
 
-        <label>Contact Info</label>
-        <input type="text" id="empContact">
+            <label>Quantity</label>
+            <input type="number" id="posQuantity" min="1" value="1">
 
-        <label>Role</label>
-        <input type="text" id="empRole">
+            <button onclick="processConcessionPOS()">Complete POS Sale</button>
+            <p id="posMessage"></p>
+        </div>
 
-        <label>Hire Date</label>
-        <input type="date" id="empHireDate">
+        <!-- EMPLOYEES SECTION -->
+        <div id="employeesSection" class="admin-section" style="display:none;">
+            <h2>Employees</h2>
 
-        <label>Pay Rate</label>
-        <input type="number" id="empPay" step="0.01">
+            <h3>Add Employee</h3>
 
-        <label>Assigned Theater</label>
-        <select id="empTheater">
-            <option>North Theater</option>
-            <option>Downtown Theater</option>
-            <option>West Theater</option>
-        </select>
+            <label>Name</label>
+            <input type="text" id="empName">
 
-        <button onclick="addEmployee()">Add Employee</button>
+            <label>Contact Info</label>
+            <input type="text" id="empContact">
 
-        <ul id="employeeList"></ul>
+            <label>Role</label>
+            <input type="text" id="empRole">
 
-        <hr>
+            <label>Hire Date</label>
+            <input type="date" id="empHireDate">
 
-        <h3>Create Employee Schedule</h3>
+            <label>Pay Rate</label>
+            <input type="number" id="empPay" step="0.01">
 
-        <label>Employee</label>
-        <select id="shiftEmployee"></select>
+            <label>Assigned Theater</label>
+            <select id="empTheater">
+                <option>North Theater</option>
+                <option>Downtown Theater</option>
+                <option>West Theater</option>
+            </select>
 
-        <label>Date</label>
-        <input type="date" id="shiftDate">
+            <button onclick="addEmployee()">Add Employee</button>
 
-        <label>Start Time</label>
-        <input type="time" id="shiftStart">
+            <h3>Employee List</h3>
+            <ul id="employeeList"></ul>
 
-        <label>End Time</label>
-        <input type="time" id="shiftEnd">
+            <h3>Create Employee Schedule</h3>
 
-        <label>Position</label>
-        <select id="shiftPosition">
-            <option>Box Office</option>
-            <option>Concessions</option>
-            <option>Usher</option>
-        </select>
+            <label>Employee</label>
+            <select id="shiftEmployee"></select>
 
-        <label>Showtime Block</label>
-        <select id="shiftShowtime"></select>
+            <label>Date</label>
+            <input type="date" id="shiftDate">
 
-        <button onclick="addShift()">Add Shift</button>
-        <p id="shiftMessage"></p>
+            <label>Start Time</label>
+            <input type="time" id="shiftStart">
 
-        <h3>Employee Schedule</h3>
-        <ul id="scheduleEmployeeList"></ul>
+            <label>End Time</label>
+            <input type="time" id="shiftEnd">
 
-        <hr>
+            <label>Position</label>
+            <select id="shiftPosition">
+                <option>Box Office</option>
+                <option>Concessions</option>
+                <option>Usher</option>
+            </select>
 
-        <h3>Sales Report</h3>
-        <div class="report-box">
-            <p>Ticket Sales: <strong id="ticketSalesTotal">$0.00</strong></p>
-            <p>Concession Sales: <strong id="concessionSalesTotal">$0.00</strong></p>
-            <p>Total Sales: <strong id="allSalesTotal">$0.00</strong></p>
+            <label>Showtime Block</label>
+            <select id="shiftShowtime"></select>
+
+            <button onclick="addShift()">Add Shift</button>
+            <p id="shiftMessage"></p>
+
+            <h3>Employee Schedule</h3>
+            <ul id="scheduleEmployeeList"></ul>
+        </div>
+
+        <!-- REPORTS SECTION -->
+        <div id="reportsSection" class="admin-section" style="display:none;">
+            <h2>Reports</h2>
+
+            <div class="report-box">
+                <p>Ticket Sales: <strong id="ticketSalesTotal">$0.00</strong></p>
+                <p>Concession Sales: <strong id="concessionSalesTotal">$0.00</strong></p>
+                <p>Total Sales: <strong id="allSalesTotal">$0.00</strong></p>
+            </div>
         </div>
 
     </div>
