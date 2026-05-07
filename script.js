@@ -17,8 +17,29 @@ document.addEventListener("DOMContentLoaded", function () {
     loadConcessions();
     loadEmployees();
     loadEmployeeSchedules();
+    loadAuditoriums();
     loadSalesReport();
 });
+
+function showAdminSection(sectionId) {
+    const sections = document.querySelectorAll(".admin-section");
+
+    sections.forEach(section => {
+        section.style.display = "none";
+    });
+
+    const selected = document.getElementById(sectionId);
+
+    if (selected) {
+        selected.style.display = "block";
+    }
+
+    loadSalesReport();
+    loadConcessions();
+    loadEmployees();
+    loadEmployeeSchedules();
+    loadAuditoriums();
+}
 
 function checkPassword() {
     const input = document.getElementById("adminPassword").value;
@@ -27,11 +48,7 @@ function checkPassword() {
     if (input === ADMIN_PASSWORD) {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("adminPanel").style.display = "block";
-        loadMovies();
-        loadConcessions();
-        loadEmployees();
-        loadEmployeeSchedules();
-        loadSalesReport();
+        showAdminSection("moviesSection");
     } else {
         msg.textContent = "Incorrect password.";
         msg.style.color = "red";
@@ -84,6 +101,14 @@ function getSchedules() {
 
 function saveSchedules(data) {
     localStorage.setItem("employeeSchedules", JSON.stringify(data));
+}
+
+function getAuditoriums() {
+    return JSON.parse(localStorage.getItem("auditoriums")) || [];
+}
+
+function saveAuditoriums(data) {
+    localStorage.setItem("auditoriums", JSON.stringify(data));
 }
 
 function generateConfirmationCode() {
@@ -1008,6 +1033,69 @@ function deleteShift(id) {
     const schedules = getSchedules().filter(s => s.id !== id);
     saveSchedules(schedules);
     loadEmployeeSchedules();
+}
+
+function addAuditorium() {
+    const theaterName = document.getElementById("theaterName").value.trim();
+    const auditoriumName = document.getElementById("auditoriumName").value.trim();
+    const capacity = parseInt(document.getElementById("auditoriumCapacity").value, 10);
+
+    if (!theaterName || !auditoriumName || isNaN(capacity)) {
+        alert("Please fill out all auditorium fields.");
+        return;
+    }
+
+    const auditoriums = getAuditoriums();
+
+    auditoriums.push({
+        id: Date.now(),
+        theaterName,
+        auditoriumName,
+        capacity
+    });
+
+    saveAuditoriums(auditoriums);
+
+    document.getElementById("theaterName").value = "";
+    document.getElementById("auditoriumName").value = "";
+    document.getElementById("auditoriumCapacity").value = "";
+
+    loadAuditoriums();
+}
+
+function loadAuditoriums() {
+    const list = document.getElementById("auditoriumList");
+    if (!list) return;
+
+    const auditoriums = getAuditoriums();
+
+    list.innerHTML = "";
+
+    if (auditoriums.length === 0) {
+        list.innerHTML = "<li>No auditoriums added.</li>";
+        return;
+    }
+
+    auditoriums.forEach(aud => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <div>
+                <strong>${aud.theaterName}</strong><br>
+                Auditorium: ${aud.auditoriumName}<br>
+                Capacity: ${aud.capacity}
+            </div>
+            <button onclick="deleteAuditorium(${aud.id})">Delete</button>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+function deleteAuditorium(id) {
+    const auditoriums = getAuditoriums().filter(a => a.id !== id);
+    saveAuditoriums(auditoriums);
+    loadAuditoriums();
 }
 
 function loadSalesReport() {
